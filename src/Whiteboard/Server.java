@@ -14,8 +14,8 @@ import java.util.ArrayList;
 public class Server {
     ArrayList<Socket> sockets = new ArrayList<Socket>(); // the socket list used to store client sockets
     ArrayList<Message> shapes = new ArrayList<Message>(); // the list used to store all the shapes on the canvas
-    ArrayList<OutputStream> outputStreams = new ArrayList<OutputStream>();
-    ArrayList<InputStream> inputStreams = new ArrayList<InputStream>();
+    ArrayList<ObjectOutputStream> ObjectOutputs = new ArrayList<ObjectOutputStream>();
+    ArrayList<ObjectInputStream> ObjectInputs = new ArrayList<ObjectInputStream>();
 
     public static void main(String[] args) throws IOException {
         Server s = new Server();
@@ -33,8 +33,8 @@ public class Server {
 
             // put client socket into the socket list
             sockets.add(client);
-            outputStreams.add(client.getOutputStream());
-            inputStreams.add(client.getInputStream());
+            ObjectInputs.add(new ObjectInputStream(client.getInputStream()));
+            ObjectOutputs.add(new ObjectOutputStream(client.getOutputStream()));
             System.out.println("received a client");
 
             // open monitor for that client
@@ -53,12 +53,8 @@ public class Server {
         public Monitor(int socketNum) {
             this.socketNum = socketNum;
             Socket s = sockets.get(socketNum);
-            try {
-                this.oi = new ObjectInputStream(inputStreams.get(socketNum));
-                this.os = new ObjectOutputStream(outputStreams.get(socketNum));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            this.oi = ObjectInputs.get(socketNum);
+            this.os = ObjectOutputs.get(socketNum);
         }
         @Override
         public void run() {
@@ -66,19 +62,21 @@ public class Server {
                 try {
                     Message m =((Message) oi.readObject());
 
-                    // if the message is a shape, add it to the shape list
+                    // if the message is a shape, save it in the shape list
                     if(m instanceof canvasShape) {
                         shapes.add(m);
                     }
-
-                    // send the message to any other peers except the sender itself
+//                    os.writeObject(m);
+//                    os.flush();
                     for (int i=0 ; i<sockets.size() ; i++) {
+
                             if (i == socketNum) {continue;}
                             else {
-                                ObjectOutputStream os2 = new ObjectOutputStream(outputStreams.get(i));
-                                os2.writeObject(m);
-                                os2.flush();
+                                ObjectOutputStream oos = ObjectOutputs.get(i);
+                                oos.writeObject(m);
+                                oos.flush();
                             }
+
                     }
 
                 } catch (IOException | ClassNotFoundException e)  {

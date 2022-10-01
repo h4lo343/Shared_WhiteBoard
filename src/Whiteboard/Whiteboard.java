@@ -33,9 +33,9 @@ public class Whiteboard {
         wb.start();
 
     }
-
+//"100.93.54.162"
     public void start() throws IOException {
-        Socket s = new Socket("100.93.54.162",8888);
+        Socket s = new Socket( InetAddress.getLocalHost(),8888);
 
         this.s=s;
 //        this.oos = new ObjectInputStream(s.getInputStream());\
