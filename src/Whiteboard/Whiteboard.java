@@ -35,7 +35,7 @@ public class Whiteboard {
     }
 
     public void start() throws IOException {
-        Socket s = new Socket(InetAddress.getLocalHost(),8888);
+        Socket s = new Socket("100.93.54.162",8888);
 
         this.s=s;
 //        this.oos = new ObjectInputStream(s.getInputStream());\
@@ -353,7 +353,7 @@ public class Whiteboard {
                                 break;
 
                             case"Pen":
-                                this.listener.drawPen(shape.y, shape.y, shape.x1, shape.y1);
+                                this.listener.drawPen(shape.x, shape.y, shape.x1, shape.y1);
                                 break;
 
                         }
