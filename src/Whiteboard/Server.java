@@ -17,7 +17,7 @@ public class Server {
     ArrayList<OutputStream> outputStreams = new ArrayList<OutputStream>();
     ArrayList<InputStream> inputStreams = new ArrayList<InputStream>();
 
-        public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
         Server s = new Server();
         s.run();
 
@@ -65,25 +65,21 @@ public class Server {
             while (true) {
                 try {
                     Message m =((Message) oi.readObject());
-                    System.out.println(((canvasShape)m).x);
-                    shapes.add(m);
-                    os.writeObject(shapes.get(shapes.size()-1));
-//                    for (int i=0 ; i<sockets.size() ; i++) {
-//                        try{
-//                            if (i == socketNum) {continue;}
-//                            else {
-//                                ObjectOutputStream oos = new ObjectOutputStream(sockets.get(i).getOutputStream());
-//                                oos.writeObject(m);
-//                                oos.flush();
-//                                oos.close();
-//                            }
-//                        }catch (Exception e){
-//                        }
-//                    }
-//                    // if there is a message received, open a disposed for it
-//                    dispose d = new dispose(m, this.socketNum);
-//                    d.start();
-//                    oi.close();
+
+                    // if the message is a shape, add it to the shape list
+                    if(m instanceof canvasShape) {
+                        shapes.add(m);
+                    }
+
+                    // send the message to any other peers except the sender itself
+                    for (int i=0 ; i<sockets.size() ; i++) {
+                            if (i == socketNum) {continue;}
+                            else {
+                                os.writeObject(m);
+                                os.flush();
+
+                            }
+                    }
 
                 } catch (IOException | ClassNotFoundException e)  {
                     e.printStackTrace();

@@ -15,7 +15,7 @@ import java.net.Socket;
  * @author XIANGNAN ZHOU_1243072
  * @date 2022/9/27 22:33
  */
-public class BoardLisener implements MouseListener, ActionListener, MouseMotionListener {
+public class BoardListener implements MouseListener, ActionListener, MouseMotionListener {
     // the index for mouse: x,y(the pressed pint), x1,y1(drag point), x2,y2(release point)
     int x, y, x1, y1, x2, y2;
     String penType = "Pen";
@@ -31,7 +31,9 @@ public class BoardLisener implements MouseListener, ActionListener, MouseMotionL
         this.graph = g;
     }
 
-    public void setGraphSave(Graphics2D g) {this.graphSave = g; }
+    public void setGraphSave(Graphics2D g) {
+        this.graphSave = g;
+    }
 
     public void setColor(Color c) {
         this.currentColor = c;
@@ -41,9 +43,14 @@ public class BoardLisener implements MouseListener, ActionListener, MouseMotionL
         this.penType = t;
     }
 
-    public void setText(String t) { this.text = t; }
+    public void setText(String t) {
+        this.text = t;
+    }
 
-    public void setOutPutStream(OutputStream os) throws IOException {  this.os = os; this.oos = new ObjectOutputStream(os); }
+    public void setOutPutStream(OutputStream os) throws IOException {
+        this.os = os;
+        this.oos = new ObjectOutputStream(os);
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -52,9 +59,8 @@ public class BoardLisener implements MouseListener, ActionListener, MouseMotionL
         // if the click is from colored button,
         // set the color of the current color
         if (source.equals("")) {
-            setColor(((JButton)e.getSource()).getBackground());
-        }
-        else {
+            setColor(((JButton) e.getSource()).getBackground());
+        } else {
             this.setPenType(e.getActionCommand());
         }
     }
@@ -77,28 +83,27 @@ public class BoardLisener implements MouseListener, ActionListener, MouseMotionL
         y2 = e.getY();
 
         // draw the straight line
-        if(penType.equals("Line")) {
-            graph.drawLine(x2,y2,x,y);
-            graphSave.drawLine(x2,y2,x,y);
-            sendShape("Line",x2,x,y2,y);
+        if (penType.equals("Line")) {
+            drawStraightLine(x2, y2, x, y);
+            sendShape("Line", x2, x, y2, y);
         }
 
         // draw rectangle
-        if(penType.equals("Rectangle")) {
-            graph.drawRect(Math.min(x,x2),Math.min(y,y2),Math.abs(x2-x),Math.abs(y2-y));
-            graphSave.drawRect(Math.min(x,x2),Math.min(y,y2),Math.abs(x2-x),Math.abs(y2-y));
+        if (penType.equals("Rectangle")) {
+            graph.drawRect(Math.min(x, x2), Math.min(y, y2), Math.abs(x2 - x), Math.abs(y2 - y));
+            graphSave.drawRect(Math.min(x, x2), Math.min(y, y2), Math.abs(x2 - x), Math.abs(y2 - y));
         }
 
         // draw circle
         if (penType.equals("Circle")) {
-            graph.drawOval(Math.min(x,x2),Math.min(y,y2), Math.abs(x-x2),Math.abs(y-y2));
-            graphSave.drawOval(Math.min(x,x2),Math.min(y,y2), Math.abs(x-x2),Math.abs(y-y2));
+            graph.drawOval(Math.min(x, x2), Math.min(y, y2), Math.abs(x - x2), Math.abs(y - y2));
+            graphSave.drawOval(Math.min(x, x2), Math.min(y, y2), Math.abs(x - x2), Math.abs(y - y2));
         }
 
         // draw triangle
         if (penType.equals("Triangle")) {
-            graph.drawPolygon(new int[]{Math.min(x,x2),Math.min(x,x2)+Math.abs(x-x2)/2,Math.min(x,x2)+Math.abs(x-x2)},new int[]{Math.min(y,y2)+Math.abs(y-y2),Math.min(y,y2),Math.min(y,y2)+Math.abs(y-y2)},3);
-            graphSave.drawPolygon(new int[]{Math.min(x,x2),Math.min(x,x2)+Math.abs(x-x2)/2,Math.min(x,x2)+Math.abs(x-x2)},new int[]{Math.min(y,y2)+Math.abs(y-y2),Math.min(y,y2),Math.min(y,y2)+Math.abs(y-y2)},3);
+            graph.drawPolygon(new int[]{Math.min(x, x2), Math.min(x, x2) + Math.abs(x - x2) / 2, Math.min(x, x2) + Math.abs(x - x2)}, new int[]{Math.min(y, y2) + Math.abs(y - y2), Math.min(y, y2), Math.min(y, y2) + Math.abs(y - y2)}, 3);
+            graphSave.drawPolygon(new int[]{Math.min(x, x2), Math.min(x, x2) + Math.abs(x - x2) / 2, Math.min(x, x2) + Math.abs(x - x2)}, new int[]{Math.min(y, y2) + Math.abs(y - y2), Math.min(y, y2), Math.min(y, y2) + Math.abs(y - y2)}, 3);
         }
 
         // insert the text
@@ -123,19 +128,18 @@ public class BoardLisener implements MouseListener, ActionListener, MouseMotionL
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        x1=e.getX();
-        y1=e.getY();
+        x1 = e.getX();
+        y1 = e.getY();
         graph.setColor(this.currentColor);
         graphSave.setColor(this.currentColor);
 
         // if it is pen mode now, drawing line
         if (penType.equals("Pen")) {
 
-            graph.drawLine(x, y, x1, y1);
-            graphSave.drawLine(x, y, x1, y1);
-//            sendShape("Pen",x,x1,y,y1);
-            x=x1;
-            y=y1;
+            drawPen(x, y, x1, y1);
+            sendShape("Pen", x, x1, y, y1);
+            x = x1;
+            y = y1;
         }
 
         // eraser operation
@@ -146,8 +150,10 @@ public class BoardLisener implements MouseListener, ActionListener, MouseMotionL
             graphSave.setColor(Color.WHITE);
             graph.setStroke(new BasicStroke(20));
             graphSave.setStroke(new BasicStroke(20));
-            graph.drawLine(x,y,x1,y1);
-            graphSave.drawLine(x,y,x1,y1);
+            graph.drawLine(x, y, x1, y1);
+            graphSave.drawLine(x, y, x1, y1);
+            x = x1;
+            y = y1;
 
             // recover the normal stroke and color
             graph.setStroke(new BasicStroke(3));
@@ -162,14 +168,26 @@ public class BoardLisener implements MouseListener, ActionListener, MouseMotionL
 
     }
 
-    public void sendShape(String message, int x,int x1, int y, int y1)  {
+    public void sendShape(String message, int x, int x1, int y, int y1) {
         try {
-            Message m = new canvasShape(message, "1",x,x1,y,y1);
+            Message m = new canvasShape(message, "1", x, x1, y, y1);
             oos.writeObject(m);
             oos.flush();
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    // draw straight line method
+    public void drawStraightLine(int x2, int y2, int x, int y) {
+        graph.drawLine(x2, y2, x, y);
+        graphSave.drawLine(x2, y2, x, y);
+    }
+
+    // draw pen method
+    public void drawPen(int x, int y, int x1, int y1) {
+        graph.drawLine(x, y, x1, y1);
+        graphSave.drawLine(x, y, x1, y1);
     }
 }

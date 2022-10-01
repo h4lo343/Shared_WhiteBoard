@@ -4,9 +4,7 @@ import Message.Message;
 import Message.canvasShape;
 
 import javax.imageio.ImageIO;
-import javax.sound.midi.Receiver;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,7 +20,7 @@ import java.net.Socket;
  */
 public class Whiteboard {
     Graphics2D g;
-    BoardLisener l;
+    BoardListener l;
     Socket s;
     InputStream is;
     OutputStream os;
@@ -43,11 +41,15 @@ public class Whiteboard {
 //        this.oos = new ObjectInputStream(s.getInputStream());\
         this.is=s.getInputStream();
         this.os=s.getOutputStream();
+
+        // init the listener
+        BoardListener listener = new BoardListener();
+        this.l = listener;
         boardUI();
 
 
         // open a receiver
-        Receive r = new Receive(s);
+        Receive r = new Receive(s,l);
         r.start();
 
 
@@ -67,11 +69,9 @@ public class Whiteboard {
         board.setResizable(false);
         // use border layout
         board.setLayout(new BorderLayout());
-        // init the listener
-        BoardLisener    listener = new BoardLisener();
-        this.l = listener;
+
         // set default color
-        listener.setColor(Color.black);
+        l.setColor(Color.black);
 
         // create the image I/O and related graphics2D object
         BufferedImage bi = new BufferedImage(1200, 800, BufferedImage.TYPE_INT_ARGB);
@@ -87,8 +87,8 @@ public class Whiteboard {
         canva.setBackground(Color.white);
         board.add(canva, BorderLayout.CENTER);
 
-        canva.addMouseListener(listener);
-        canva.addMouseMotionListener(listener);
+        canva.addMouseListener(l);
+        canva.addMouseMotionListener(l);
 
 
 
@@ -129,13 +129,13 @@ public class Whiteboard {
                     open.showSaveDialog(null);
                     File newFile = open.getSelectedFile();
                     Image read = ImageIO.read(open.getSelectedFile());
-                    listener.graph.drawImage(read, 0, 0, new ImageObserver() {
+                    l.graph.drawImage(read, 0, 0, new ImageObserver() {
                         @Override
                         public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
                             return false;
                         }
                     });
-                    listener.graphSave.drawImage(read, 0, 0, new ImageObserver() {
+                    l.graphSave.drawImage(read, 0, 0, new ImageObserver() {
                         @Override
                         public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
                             return false;
@@ -213,7 +213,7 @@ public class Whiteboard {
         for (int i = 0; i <= functionButtons.length - 1; i++) {
             JButton button = new JButton(functionButtons[i]);
             functionBar.add(button);
-            button.addActionListener(listener);
+            button.addActionListener(l);
         }
         JLabel text = new JLabel("input your text:");
         functionBar.add(text);
@@ -229,8 +229,8 @@ public class Whiteboard {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String content = textInput.getText();
-                listener.setPenType("Text");
-                listener.setText(content);
+                l.setPenType("Text");
+                l.setText(content);
             }
         });
         functionBar.add(textButton);
@@ -258,7 +258,7 @@ public class Whiteboard {
             button.setBackground(colors[i]);
             button.setPreferredSize(new Dimension(40, 40));
 
-            button.addActionListener(listener);
+            button.addActionListener(l);
             colorBar.add(button);
         }
 
@@ -318,27 +318,22 @@ public class Whiteboard {
         // set default stroke
         g.setStroke(new BasicStroke(3));
         graphSave.setStroke(new BasicStroke(3));
-        listener.setGraphSave(graphSave);
-        listener.setGraph(g);
-        listener.setOutPutStream(this.os);
+        l.setGraphSave(graphSave);
+        l.setGraph(g);
+        l.setOutPutStream(this.os);
 
 
     }
 
-
-    public void readShape(canvasShape m) {
-        if (m.message.equals("Line")) {
-            this.l.graph.drawLine(m.x,m.y,m.x1,m.y1);
-            this.l.graphSave.drawLine(m.x,m.y,m.x1,m.y1);
-        }
-    }
     // the class for board to receive message from server
     public class Receive extends Thread {
 
         ObjectInputStream ois;
+        BoardListener listener;
 
-        public Receive(Socket s) throws IOException {
+        public Receive(Socket s, BoardListener listener) throws IOException {
             this.ois = new ObjectInputStream(new BufferedInputStream(s.getInputStream()));
+            this.listener=listener;
         }
 
         @Override
@@ -346,9 +341,25 @@ public class Whiteboard {
             while (true) {
                 try {
 
-                    canvasShape m =((canvasShape) this.ois.readObject());
-                        System.out.println(m.x);
-//                        readShape((canvasShape) m);
+                    Message m =(Message) this.ois.readObject();
+
+
+                    if (m instanceof canvasShape) {
+                        canvasShape shape = (canvasShape)m;
+                        String type = m.message;
+                        switch (type) {
+                            case"Line":
+                                this.listener.drawStraightLine(shape.x, shape.y,shape.x1,shape.y1);
+                                break;
+
+                            case"Pen":
+                                this.listener.drawPen(shape.y, shape.y, shape.x1, shape.y1);
+                                break;
+
+                        }
+
+                    }
+                    // the switch is used to judge the type of shape
 
                 }
                 catch (IOException | ClassNotFoundException e)  {
