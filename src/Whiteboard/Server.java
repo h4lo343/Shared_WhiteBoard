@@ -75,10 +75,10 @@ public class Server {
                 try {
                     Message m =((Message) oi.readObject());
 
-//                    // receive the hello message and get the user's ID
-//                    if (m.message.equals("hello")) {
-//
-//                    }
+                    // receive the hello message and get the user's ID
+                    if (m.message.equals("Hello")) {
+                        System.out.println("a new client connected: "+m.senderID);
+                    }
 
                     // if the message is a shape, save it in the shape list, and
                     // send other peers the shape sent by a user except itself
@@ -96,8 +96,6 @@ public class Server {
                             }
                         }
                     }
-
-
 
                 } catch (IOException | ClassNotFoundException e)  {
                     e.printStackTrace();

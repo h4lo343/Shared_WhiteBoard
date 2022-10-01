@@ -36,7 +36,7 @@ public class Whiteboard {
         wb.start();
 
     }
-//"100.93.54.162"
+    //"100.93.54.162"
     public void start() throws IOException {
 
         // connect to the socket and set up relevant I/O stream
@@ -45,7 +45,12 @@ public class Whiteboard {
         this.is = s.getInputStream();
         this.os = s.getOutputStream();
 
-        // create a random userName, and set it to class
+        // init the listener
+        BoardListener listener = new BoardListener();
+        this.l = listener;
+        boardUI();
+
+        // create a random userName, and set it to class and listener
         StringBuffer sb = new StringBuffer();
         for (int i=0; i<6 ; i++) {
             char c =(char)( new Random().nextInt(26)+'a' ) ;
@@ -53,16 +58,13 @@ public class Whiteboard {
         }
         String userID = new String(sb);
         this.userID = userID;
+        listener.setUserID(userID);
 
-//        // send server a welcome message
-//        ObjectOutputStream oos = new ObjectOutputStream(os);
-//        oos.writeObject(new Message("Hello", userID));
+        // invoke method on listener, send hello to server
+        listener.sendHello();
 
 
-        // init the listener
-        BoardListener listener = new BoardListener();
-        this.l = listener;
-        boardUI();
+
 
         // open a receiver
         Receive r = new Receive(s, l);
@@ -331,7 +333,6 @@ public class Whiteboard {
         l.setGraphSave(graphSave);
         l.setGraph(g);
         l.setOutPutStream(this.os);
-        l.setUserID(userID);
 
     }
 

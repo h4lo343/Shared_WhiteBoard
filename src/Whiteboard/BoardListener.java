@@ -273,4 +273,18 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
         graph.setColor(currentColor);
         graphSave.setColor(currentColor);
     }
+
+    // the message for client to send hello message with its id t
+    // to the server
+    public void sendHello() {
+        Message hello = new Message("Hello", userID);
+        try {
+            oos.writeObject(hello);
+            oos.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 }
+
