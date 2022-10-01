@@ -25,10 +25,14 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
     String text;
     OutputStream os;
     ObjectOutputStream oos;
-    String senderID;
+    String userID;
 
     public void setGraph(Graphics2D g) {
         this.graph = g;
+    }
+
+    public void setUserID(String u) {
+        this.userID = u;
     }
 
     public void setGraphSave(Graphics2D g) {
@@ -165,7 +169,7 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
     // the method is used to send shapes(triangle, rectangle, circle, pen, line)
     public void sendShape(String message, int x, int x1, int y, int y1) {
         try {
-            Message m = new normalShape(message, "1", x, x1, y, y1, currentColor);
+            Message m = new normalShape(message, userID, x, x1, y, y1, currentColor);
             oos.writeObject(m);
             oos.flush();
 
@@ -177,7 +181,7 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
     // the method is used to send different text shape
     public void sendText(String message, int x2, int y2, String text) {
         try {
-            Message m = new textShape(message, "1", x2, y2, text, currentColor);
+            Message m = new textShape(message, userID, x2, y2, text, currentColor);
             oos.writeObject(m);
             oos.flush();
         } catch (IOException e) {
