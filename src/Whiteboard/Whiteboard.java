@@ -1,7 +1,9 @@
 package Whiteboard;
 
 import Message.Message;
-import Message.canvasShape;
+import Message.normalShape;
+import Message.Shapes;
+import Message.textShape;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -26,34 +28,29 @@ public class Whiteboard {
     OutputStream os;
 
 
-
     public static void main(String[] args) throws IOException {
 
         Whiteboard wb = new Whiteboard();
         wb.start();
 
     }
-//"100.93.54.162"
-    public void start() throws IOException {
-        Socket s = new Socket( InetAddress.getLocalHost(),8888);
 
-        this.s=s;
-//        this.oos = new ObjectInputStream(s.getInputStream());\
-        this.is=s.getInputStream();
-        this.os=s.getOutputStream();
+    //"100.93.54.162"
+    public void start() throws IOException {
+        Socket s = new Socket(InetAddress.getLocalHost(), 8888);
+
+        this.s = s;
+        this.is = s.getInputStream();
+        this.os = s.getOutputStream();
 
         // init the listener
         BoardListener listener = new BoardListener();
         this.l = listener;
         boardUI();
 
-
         // open a receiver
-        Receive r = new Receive(s,l);
+        Receive r = new Receive(s, l);
         r.start();
-
-
-
     }
 
     public void boardUI() throws IOException {
@@ -77,13 +74,13 @@ public class Whiteboard {
         BufferedImage bi = new BufferedImage(1200, 800, BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphSave = bi.createGraphics();
         graphSave.setBackground(Color.WHITE);
-        graphSave.fillRect(0, 0, 1200,800);
+        graphSave.fillRect(0, 0, 1200, 800);
 
         /*
          * add the main canva
          */
         JPanel canva = new JPanel();
-        canva.setPreferredSize(new Dimension(1200,800));
+        canva.setPreferredSize(new Dimension(1200, 800));
         canva.setBackground(Color.white);
         board.add(canva, BorderLayout.CENTER);
 
@@ -121,7 +118,7 @@ public class Whiteboard {
                 // empty the current canva
                 canva.repaint();
 
-                try{
+                try {
 
                     // start a file choosing window
                     JFileChooser open = new JFileChooser();
@@ -143,8 +140,7 @@ public class Whiteboard {
                     });
 
 
-                }
-                catch (Exception e1){
+                } catch (Exception e1) {
                     System.out.println(e1);
                 }
             }
@@ -162,9 +158,8 @@ public class Whiteboard {
                     File file = saveAs.getSelectedFile();
                     String name = saveAs.getName(file);
 
-                    ImageIO.write(bi,"PNG", new File(saveAs.getCurrentDirectory(), name+".jpg"));
-                }
-                catch (Exception e2) {
+                    ImageIO.write(bi, "PNG", new File(saveAs.getCurrentDirectory(), name + ".jpg"));
+                } catch (Exception e2) {
                     System.out.println(e2);
                 }
 
@@ -183,9 +178,8 @@ public class Whiteboard {
                     File file = saveAs.getSelectedFile();
                     String name = saveAs.getName(file);
 
-                    ImageIO.write(bi,"png", new File(saveAs.getCurrentDirectory(), name+".png"));
-                }
-                catch (Exception e2) {
+                    ImageIO.write(bi, "png", new File(saveAs.getCurrentDirectory(), name + ".png"));
+                } catch (Exception e2) {
                     System.out.println(e2);
                 }
 
@@ -333,7 +327,7 @@ public class Whiteboard {
 
         public Receive(Socket s, BoardListener listener) throws IOException {
             this.ois = new ObjectInputStream(new BufferedInputStream(s.getInputStream()));
-            this.listener=listener;
+            this.listener = listener;
         }
 
         @Override
@@ -341,28 +335,50 @@ public class Whiteboard {
             while (true) {
                 try {
 
-                    Message m =(Message) this.ois.readObject();
+                    Message m = (Message) this.ois.readObject();
 
 
-                    if (m instanceof canvasShape) {
-                        canvasShape shape = (canvasShape)m;
-                        String type = m.message;
-                        switch (type) {
-                            case"Line":
-                                this.listener.drawStraightLine(shape.x, shape.y,shape.x1,shape.y1);
-                                break;
+                    // if the message is a shape, then it must be the shaped drawn by other peer
+                    // draw these shapes on its own canvas using different drawing methods
+                    if (m instanceof Shapes) {
 
-                            case"Pen":
-                                this.listener.drawPen(shape.x, shape.y, shape.x1, shape.y1);
-                                break;
+                        if (m instanceof normalShape) {
+                            normalShape shape = (normalShape) m;
+                            String type = m.message;
 
+                            switch (type) {
+                                case "Line":
+                                    this.listener.drawStraightLine(shape.x, shape.y, shape.x1, shape.y1, shape.color);
+                                    break;
+
+                                case "Pen":
+                                    this.listener.drawPen(shape.x, shape.y, shape.x1, shape.y1, shape.color);
+                                    break;
+
+                                case "Triangle":
+                                    this.listener.drawTriangle(shape.x, shape.x1, shape.y, shape.y1, shape.color);
+                                    break;
+
+                                case "Circle":
+                                    this.listener.drawCircle(shape.x, shape.x1, shape.y, shape.y1, shape.color);
+
+                                case "Rectangle":
+                                    this.listener.drawRectangle(shape.x, shape.x1, shape.y, shape.y1, shape.color);
+
+                            }
                         }
+
+                        if (m instanceof textShape) {
+                            textShape text = (textShape) m;
+                            System.out.println(text.text);
+                            this.listener.drawText(text.x, text.y, text.text, text.color);
+                        }
+
 
                     }
                     // the switch is used to judge the type of shape
 
-                }
-                catch (IOException | ClassNotFoundException e)  {
+                } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
             }

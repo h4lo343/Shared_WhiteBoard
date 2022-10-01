@@ -1,7 +1,8 @@
 package Whiteboard;
 
 import Message.Message;
-import Message.canvasShape;
+import Message.normalShape;
+import Message.textShape;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,7 +10,6 @@ import java.awt.event.*;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.net.Socket;
 
 /**
  * @author XIANGNAN ZHOU_1243072
@@ -84,34 +84,32 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
 
         // draw the straight line
         if (penType.equals("Line")) {
-            drawStraightLine(x2, y2, x, y);
+            drawStraightLine(x2, y2, x, y, currentColor);
             sendShape("Line", x2, x, y2, y);
         }
 
         // draw rectangle
         if (penType.equals("Rectangle")) {
-            graph.drawRect(Math.min(x, x2), Math.min(y, y2), Math.abs(x2 - x), Math.abs(y2 - y));
-            graphSave.drawRect(Math.min(x, x2), Math.min(y, y2), Math.abs(x2 - x), Math.abs(y2 - y));
+            drawRectangle(x, x2, y, y2, currentColor);
+            sendShape("Rectangle",x,x2,y,y2);
         }
 
         // draw circle
         if (penType.equals("Circle")) {
-            graph.drawOval(Math.min(x, x2), Math.min(y, y2), Math.abs(x - x2), Math.abs(y - y2));
-            graphSave.drawOval(Math.min(x, x2), Math.min(y, y2), Math.abs(x - x2), Math.abs(y - y2));
+            drawCircle(x, x2, y, y2, currentColor);
+            sendShape("Circle", x, x2, y,y2);
         }
 
         // draw triangle
         if (penType.equals("Triangle")) {
-            graph.drawPolygon(new int[]{Math.min(x, x2), Math.min(x, x2) + Math.abs(x - x2) / 2, Math.min(x, x2) + Math.abs(x - x2)}, new int[]{Math.min(y, y2) + Math.abs(y - y2), Math.min(y, y2), Math.min(y, y2) + Math.abs(y - y2)}, 3);
-            graphSave.drawPolygon(new int[]{Math.min(x, x2), Math.min(x, x2) + Math.abs(x - x2) / 2, Math.min(x, x2) + Math.abs(x - x2)}, new int[]{Math.min(y, y2) + Math.abs(y - y2), Math.min(y, y2), Math.min(y, y2) + Math.abs(y - y2)}, 3);
+            drawTriangle(x, x2, y, y2, currentColor);
+            sendShape("Triangle", x, x2, y, y2);
         }
 
         // insert the text
         if (penType.equals("Text")) {
-            graph.setColor(currentColor);
-            graphSave.setColor(currentColor);
-            graph.drawString(this.text, x2, y2);
-            graphSave.drawString(this.text, x2, y2);
+            drawText(x2,y2, this.text, currentColor);
+            sendText("Text",x2,y2,text);
         }
 
     }
@@ -136,7 +134,7 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
         // if it is pen mode now, drawing line
         if (penType.equals("Pen")) {
 
-            drawPen(x, y, x1, y1);
+            drawPen(x, y, x1, y1, currentColor);
             sendShape("Pen", x, x1, y, y1);
             x = x1;
             y = y1;
@@ -144,14 +142,10 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
 
         // eraser operation
         if (penType.equals("Eraser")) {
-            // set the eraser color as white
-            // to cover paints
-            graph.setColor(Color.WHITE);
-            graphSave.setColor(Color.WHITE);
-            graph.setStroke(new BasicStroke(20));
-            graphSave.setStroke(new BasicStroke(20));
-            graph.drawLine(x, y, x1, y1);
-            graphSave.drawLine(x, y, x1, y1);
+
+            drawEraser(x, y, x1, y1);
+            sendShape("Eraser", x, x1, y, y1);
+
             x = x1;
             y = y1;
 
@@ -168,9 +162,10 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
 
     }
 
+    // the method is used to send shapes(triangle, rectangle, circle, pen, line)
     public void sendShape(String message, int x, int x1, int y, int y1) {
         try {
-            Message m = new canvasShape(message, "1", x, x1, y, y1);
+            Message m = new normalShape(message, "1", x, x1, y, y1, currentColor);
             oos.writeObject(m);
             oos.flush();
 
@@ -179,15 +174,99 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
         }
     }
 
+    // the method is used to send different text shape
+    public void sendText(String message, int x2, int y2, String text) {
+        try {
+            Message m = new textShape(message, "1", x2, y2, text, currentColor);
+            oos.writeObject(m);
+            oos.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     // draw straight line method
-    public void drawStraightLine(int x2, int y2, int x, int y) {
+    public void drawStraightLine(int x2, int y2, int x, int y, Color color) {
+        graph.setColor(color);
+        graphSave.setColor(color);
+
         graph.drawLine(x2, y2, x, y);
         graphSave.drawLine(x2, y2, x, y);
+
+        // restore the color
+        graph.setColor(currentColor);
+        graphSave.setColor(currentColor);
     }
 
     // draw pen method
-    public void drawPen(int x, int y, int x1, int y1) {
+    public void drawPen(int x, int y, int x1, int y1, Color color) {
+        graph.setColor(color);
+        graphSave.setColor(color);
+
         graph.drawLine(x, y, x1, y1);
         graphSave.drawLine(x, y, x1, y1);
+
+        graph.setColor(currentColor);
+        graphSave.setColor(currentColor);
+    }
+
+
+    // draw triangle method
+    public void drawTriangle(int x, int x2, int y, int y2, Color color) {
+        graph.setColor(color);
+        graphSave.setColor(color);
+
+        // algorithm for drawing a triangle, overall idea is: draw a rectangle, and take a triangle from it
+        // based on its length
+        graph.drawPolygon(new int[]{Math.min(x, x2), Math.min(x, x2) + Math.abs(x - x2) / 2, Math.min(x, x2) + Math.abs(x - x2)}, new int[]{Math.min(y, y2) + Math.abs(y - y2), Math.min(y, y2), Math.min(y, y2) + Math.abs(y - y2)}, 3);
+        graphSave.drawPolygon(new int[]{Math.min(x, x2), Math.min(x, x2) + Math.abs(x - x2) / 2, Math.min(x, x2) + Math.abs(x - x2)}, new int[]{Math.min(y, y2) + Math.abs(y - y2), Math.min(y, y2), Math.min(y, y2) + Math.abs(y - y2)}, 3);
+
+        graph.setColor(currentColor);
+        graphSave.setColor(currentColor);
+    }
+
+    // draw circle method
+    public void drawCircle(int x, int x2, int y, int y2, Color color) {
+        graph.setColor(color);
+        graphSave.setColor(color);
+
+        graph.drawOval(Math.min(x, x2), Math.min(y, y2), Math.abs(x - x2), Math.abs(y - y2));
+        graphSave.drawOval(Math.min(x, x2), Math.min(y, y2), Math.abs(x - x2), Math.abs(y - y2));
+
+        graph.setColor(currentColor);
+        graphSave.setColor(currentColor);
+    }
+
+    // method that performs eraser function
+    public void drawEraser(int x, int y, int x1, int y1) {
+
+        // set the eraser color as white
+        // to cover paints
+        graph.setColor(Color.WHITE);
+        graphSave.setColor(Color.WHITE);
+        graph.setStroke(new BasicStroke(20));
+        graphSave.setStroke(new BasicStroke(20));
+
+        graph.drawLine(x, y, x1, y1);
+        graphSave.drawLine(x, y, x1, y1);
+    }
+
+    // draw rectangle method
+    public void drawRectangle(int x, int x2, int y, int y2, Color color) {
+        graph.drawRect(Math.min(x, x2), Math.min(y, y2), Math.abs(x2 - x), Math.abs(y2 - y));
+        graphSave.drawRect(Math.min(x, x2), Math.min(y, y2), Math.abs(x2 - x), Math.abs(y2 - y));
+    }
+
+    // draw text method
+    public void drawText(int x2, int y2, String text, Color color) {
+        graph.setColor(color);
+        graphSave.setColor(color);
+
+        graph.drawString(text, x2, y2);
+        graphSave.drawString(text, x2, y2);
+
+        graph.setColor(currentColor);
+        graphSave.setColor(currentColor);
     }
 }

@@ -1,7 +1,9 @@
 package Whiteboard;
 
 import Message.Message;
-import Message.canvasShape;
+import Message.normalShape;
+import Message.Shapes;
+import Message.textShape;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -13,7 +15,7 @@ import java.util.ArrayList;
  */
 public class Server {
     ArrayList<Socket> sockets = new ArrayList<Socket>(); // the socket list used to store client sockets
-    ArrayList<Message> shapes = new ArrayList<Message>(); // the list used to store all the shapes on the canvas
+    ArrayList<Shapes> shapes = new ArrayList<Shapes>(); // the list used to store all the shapes on the canvas
     ArrayList<ObjectOutputStream> ObjectOutputs = new ArrayList<ObjectOutputStream>();
     ArrayList<ObjectInputStream> ObjectInputs = new ArrayList<ObjectInputStream>();
 
@@ -63,14 +65,17 @@ public class Server {
                     Message m =((Message) oi.readObject());
 
                     // if the message is a shape, save it in the shape list
-                    if(m instanceof canvasShape) {
-                        shapes.add(m);
+                    if(m instanceof Shapes) {
+                        shapes.add((Shapes)m);
                     }
-//                    os.writeObject(m);
-//                    os.flush();
+
                     for (int i=0 ; i<sockets.size() ; i++) {
 
-                            if (i == socketNum) {continue;}
+                            if (i == socketNum) {
+//                                continue;
+                                ObjectOutputStream oos = ObjectOutputs.get(i);
+                                oos.writeObject(m);
+                                oos.flush();}
                             else {
                                 ObjectOutputStream oos = ObjectOutputs.get(i);
                                 oos.writeObject(m);
