@@ -72,10 +72,8 @@ public class Server {
                     for (int i=0 ; i<sockets.size() ; i++) {
 
                             if (i == socketNum) {
-//                                continue;
-                                ObjectOutputStream oos = ObjectOutputs.get(i);
-                                oos.writeObject(m);
-                                oos.flush();}
+                                continue;
+                                }
                             else {
                                 ObjectOutputStream oos = ObjectOutputs.get(i);
                                 oos.writeObject(m);
