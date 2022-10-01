@@ -36,7 +36,8 @@ public class Whiteboard {
     }
 //"100.93.54.162"
     public void start() throws IOException {
-        Socket s = new Socket("100.93.54.162", 8888);
+
+        Socket s = new Socket(InetAddress.getLocalHost(), 8888);
 
         this.s = s;
         this.is = s.getInputStream();
@@ -340,7 +341,6 @@ public class Whiteboard {
                     // if the message is a shape, then it must be the shaped drawn by other peer
                     // draw these shapes on its own canvas using different drawing methods
                     if (m instanceof Shapes) {
-
                         if (m instanceof normalShape) {
                             normalShape shape = (normalShape) m;
                             String type = m.message;
@@ -364,6 +364,7 @@ public class Whiteboard {
                                 case "Rectangle":
                                     this.listener.drawRectangle(shape.x, shape.x1, shape.y, shape.y1, shape.color);
 
+                                default: return;
                             }
                         }
 

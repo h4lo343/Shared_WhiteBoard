@@ -6,6 +6,7 @@ import Message.Shapes;
 import Message.textShape;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ public class Server {
     }
 
     public void run() throws IOException {
-        System.out.println("server is online");
+        System.out.println("server is online on: "+ InetAddress.getLocalHost().getHostAddress());
         ServerSocket s = new ServerSocket(8888);
 
         // open a while loop to take any incoming request
@@ -38,6 +39,9 @@ public class Server {
             ObjectInputs.add(new ObjectInputStream(client.getInputStream()));
             ObjectOutputs.add(new ObjectOutputStream(client.getOutputStream()));
             System.out.println("received a client");
+
+            // load new client with current stored shapes
+            Init(sockets.size()-1);
 
             // open monitor for that client
             Monitor monitor = new Monitor(sockets.size()-1);
@@ -89,31 +93,13 @@ public class Server {
         }
     }
 
-//    class dispose extends Thread {
-//        Message m;
-//        int socketNum;
-//        public dispose(Message m, int socketNum) {
-//            this.m = m;
-//            this.socketNum = socketNum;
-//        }
-//
-//        @Override
-//        public void run() {
-//            if(m.message.equals("line")) {
-//                for (int i=0 ; i<sockets.size() ; i++) {
-//                    try{
-//                        if (i == socketNum) {continue;}
-//                        else {
-//                            ObjectOutputStream oos = new ObjectOutputStream(sockets.get(i).getOutputStream());
-//                            oos.writeObject(m);
-//                            oos.flush();
-//                            oos.close();
-//                        }
-//                    }catch (Exception e){
-//                    }
-//                }
-//            }
-//        }
-//    }
-
+    // if a client joined, send it all the shapes stored in shapelist to init
+    // the canvas of that client
+    public void Init(int socketNum) throws IOException {
+        ObjectOutputStream os = ObjectOutputs.get(socketNum);
+        for (int i = 0; i<shapes.size()-1;i++) {
+            os.writeObject(shapes.get(i));
+            os.flush();
+        }
+    }
 }
