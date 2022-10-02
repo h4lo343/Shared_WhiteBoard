@@ -15,7 +15,6 @@ import java.awt.image.ImageObserver;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.Random;
 
 /**
  * @author XIANGNAN ZHOU_1243072
@@ -27,7 +26,6 @@ public class Whiteboard {
     Socket s;
     InputStream is;
     OutputStream os;
-    String userID;
 
 
     public static void main(String[] args) throws IOException {
@@ -36,12 +34,10 @@ public class Whiteboard {
         wb.start();
 
     }
-
     //"100.93.54.162"
     public void start() throws IOException {
+        Socket s = new Socket("10.13.102.149", 8888);
 
-        // connect to the socket and set up relevant I/O stream
-        Socket s = new Socket(InetAddress.getLocalHost(), 8888);
         this.s = s;
         this.is = s.getInputStream();
         this.os = s.getOutputStream();
@@ -50,16 +46,6 @@ public class Whiteboard {
         BoardListener listener = new BoardListener();
         this.l = listener;
         boardUI();
-
-        // create a random userName, and set it to class and listener
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < 6; i++) {
-            char c = (char) (new Random().nextInt(26) + 'a');
-            sb.append(c);
-        }
-        String userID = new String(sb);
-        this.userID = userID;
-        listener.setUserID(userID);
 
         // open a receiver
         Receive r = new Receive(s, l);
@@ -329,10 +315,7 @@ public class Whiteboard {
         l.setGraph(g);
         l.setOutPutStream(this.os);
 
-        // when codes reach here, it means the client has started all the GUI and monitor thread
-        // send hello to server
-        // invoke method on listener, send hello to server
-        l.sendHello();
+
     }
 
     // the class for board to receive message from server
@@ -353,14 +336,16 @@ public class Whiteboard {
 
                     Message m = (Message) this.ois.readObject();
 
+
                     // if the message is a shape, then it must be the shaped drawn by other peer
                     // draw these shapes on its own canvas using different drawing methods
                     if (m instanceof Shapes) {
-                        System.out.println(m.message);
+
                         if (m instanceof normalShape) {
+                            System.out.println(m.message);
                             normalShape shape = (normalShape) m;
                             String type = m.message;
-                            // the switch is used to judge the type of shape
+
                             switch (type) {
                                 case "Line":
                                     this.listener.drawStraightLine(shape.x, shape.y, shape.x1, shape.y1, shape.color);
@@ -380,24 +365,18 @@ public class Whiteboard {
                                 case "Rectangle":
                                     this.listener.drawRectangle(shape.x, shape.x1, shape.y, shape.y1, shape.color);
 
-                                default:
-                                    return;
                             }
                         }
+
                         if (m instanceof textShape) {
                             textShape text = (textShape) m;
                             System.out.println(text.text);
                             this.listener.drawText(text.x, text.y, text.text, text.color);
                         }
-                    }
-                    // do other things if the message is not a shapes message (like updating chat window)
-                    else {
-                        String message = m.message;
-                        switch (message) {
-                            case "chat":
-                        }
-                    }
 
+
+                    }
+                    // the switch is used to judge the type of shape
 
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();

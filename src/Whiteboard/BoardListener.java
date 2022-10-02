@@ -25,14 +25,10 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
     String text;
     OutputStream os;
     ObjectOutputStream oos;
-    String userID;
+    String senderID;
 
     public void setGraph(Graphics2D g) {
         this.graph = g;
-    }
-
-    public void setUserID(String u) {
-        this.userID = u;
     }
 
     public void setGraphSave(Graphics2D g) {
@@ -153,7 +149,11 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
             x = x1;
             y = y1;
 
-
+            // recover the normal stroke and color
+            graph.setStroke(new BasicStroke(3));
+            graphSave.setStroke(new BasicStroke(3));
+            graph.setColor(this.currentColor);
+            graphSave.setColor(this.currentColor);
         }
     }
 
@@ -165,14 +165,7 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
     // the method is used to send shapes(triangle, rectangle, circle, pen, line)
     public void sendShape(String message, int x, int x1, int y, int y1) {
         try {
-            Message m;
-            // if the requester is an eraser, we have to set the color as white
-            if(message.equals("Eraser")) {
-                 m = new normalShape(message, userID, x, x1, y, y1, Color.WHITE);
-            }
-            else {
-                 m = new normalShape(message, userID, x, x1, y, y1, currentColor);
-            }
+            Message m = new normalShape(message, "1", x, x1, y, y1, currentColor);
             oos.writeObject(m);
             oos.flush();
 
@@ -184,7 +177,7 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
     // the method is used to send different text shape
     public void sendText(String message, int x2, int y2, String text) {
         try {
-            Message m = new textShape(message, userID, x2, y2, text, currentColor);
+            Message m = new textShape(message, "1", x2, y2, text, currentColor);
             oos.writeObject(m);
             oos.flush();
         } catch (IOException e) {
@@ -247,6 +240,7 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
 
     // method that performs eraser function
     public void drawEraser(int x, int y, int x1, int y1) {
+
         // set the eraser color as white
         // to cover paints
         graph.setColor(Color.WHITE);
@@ -256,12 +250,6 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
 
         graph.drawLine(x, y, x1, y1);
         graphSave.drawLine(x, y, x1, y1);
-
-        // recover the normal stroke and color
-        graph.setStroke(new BasicStroke(3));
-        graphSave.setStroke(new BasicStroke(3));
-        graph.setColor(this.currentColor);
-        graphSave.setColor(this.currentColor);
     }
 
     // draw rectangle method
@@ -281,20 +269,4 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
         graph.setColor(currentColor);
         graphSave.setColor(currentColor);
     }
-
-    // when the ui and monitor thread in client has been fully started,
-    // send hello message to inform server start I/O connections and
-    // start to sending old shapes
-    public void sendHello() {
-        Message hello = new Message("Hello", userID);
-        try {
-            oos.writeObject(hello);
-            oos.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
 }
-

@@ -1,24 +1,24 @@
 package Whiteboard;
 
 import Message.Message;
+import Message.normalShape;
 import Message.Shapes;
+import Message.textShape;
 
 import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-
-import java.util.LinkedList;
-
+import java.util.ArrayList;
 /**
  * @author XIANGNAN ZHOU_1243072
  * @date 2022/9/30 13:14
  */
 public class Server {
-    LinkedList<Socket> sockets = new LinkedList<Socket>(); // the socket list used to store client sockets
-    LinkedList<Shapes> shapes = new LinkedList<Shapes>(); // the list used to store all the shapes on the canvas
-    LinkedList<ObjectOutputStream> ObjectOutputs = new LinkedList<ObjectOutputStream>();
-    LinkedList<ObjectInputStream> ObjectInputs = new LinkedList<ObjectInputStream>();
+    ArrayList<Socket> sockets = new ArrayList<Socket>(); // the socket list used to store client sockets
+    ArrayList<Shapes> shapes = new ArrayList<Shapes>(); // the list used to store all the shapes on the canvas
+    ArrayList<ObjectOutputStream> ObjectOutputs = new ArrayList<ObjectOutputStream>();
+    ArrayList<ObjectInputStream> ObjectInputs = new ArrayList<ObjectInputStream>();
 
     public static void main(String[] args) throws IOException {
         Server s = new Server();
@@ -34,10 +34,14 @@ public class Server {
         while(true) {
             Socket client = s.accept();
 
-            // put client socket and its object I/O streams into the lists
+            // put client socket into the socket list
             sockets.add(client);
             ObjectInputs.add(new ObjectInputStream(client.getInputStream()));
             ObjectOutputs.add(new ObjectOutputStream(client.getOutputStream()));
+            System.out.println("received a client");
+
+            // load new client with current stored shapes
+            Init(sockets.size()-1);
 
             // open monitor for that client
             Monitor monitor = new Monitor(sockets.size()-1);
@@ -52,7 +56,6 @@ public class Server {
         int socketNum;
         ObjectInputStream oi;
         ObjectOutputStream os;
-        String userID;
         public Monitor(int socketNum) {
             this.socketNum = socketNum;
             Socket s = sockets.get(socketNum);
@@ -64,43 +67,27 @@ public class Server {
             while (true) {
                 try {
                     Message m =((Message) oi.readObject());
-
-                    // receive the hello message and get the user's ID
-                    if (m.message.equals("Hello")) {
-                        System.out.println("a new client connected: "+m.senderID);
-                        userID = m.senderID;
-
-                        // load new client with current stored shapes
-                        Init(sockets.size()-1);
-                    }
-
-                    // if the message is a shape, save it in the shape list, and
-                    // send other peers the shape sent by a user except itself
-                    // make the canvas concurrent
+                    System.out.println(m.message);
+                    // if the message is a shape, save it in the shape list
                     if(m instanceof Shapes) {
                         shapes.add((Shapes)m);
-                        System.out.println("receive: "+m.message);
-                        for (int i=0 ; i<sockets.size() ; i++) {
-                            if (i == socketNum) {
-                                continue;
-                            }
-                            else {
-                                ObjectOutputStream oos = ObjectOutputs.get(i);
-                                oos.writeObject(m);
-                                oos.flush();
-                            }
+                    }
+
+                    for (int i=0 ; i<sockets.size() ; i++) {
+
+                        if (i == socketNum) {
+                            continue;
                         }
+                        else {
+                            ObjectOutputStream oos = ObjectOutputs.get(i);
+                            oos.writeObject(m);
+                            oos.flush();
+                        }
+
                     }
 
                 } catch (IOException | ClassNotFoundException e)  {
                     e.printStackTrace();
-                    System.out.println("User left the room: "+userID);
-                    // move the socket and I/O in the list
-                    sockets.remove(socketNum);
-                    ObjectInputs.remove(socketNum);
-                    ObjectOutputs.remove(socketNum);
-                    break;
-
                 }
             }
         }
@@ -111,7 +98,6 @@ public class Server {
     public void Init(int socketNum) throws IOException {
         ObjectOutputStream os = ObjectOutputs.get(socketNum);
         for (int i = 0; i<shapes.size();i++) {
-            System.out.println("send: "+shapes.get(i).message);
             os.writeObject(shapes.get(i));
             os.flush();
         }
