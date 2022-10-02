@@ -81,14 +81,14 @@ public class Server {
             while (true) {
                 try {
                     Message m =((Message) oi.readObject());
-                    System.out.println("receive:"+ m.message);
+
                     // if the message is a shape, save it in the shape list
                     if(m instanceof Shapes) {
                         shapes.add((Shapes)m);
                     }
 
                     for (int i=0 ; i<sockets.size() ; i++) {
-
+                        System.out.println(sockets.size());
                         if (i == socketNum) {
                             System.out.println("continue: "+i);
                             continue;
