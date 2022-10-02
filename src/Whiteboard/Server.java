@@ -94,7 +94,7 @@ public class Server {
                             continue;
                         }
 
-                        if(sockets.get(i)!=null) {
+                        if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
                             System.out.println("------"+i+"-----");
                             ObjectOutputStream oos = ObjectOutputs.get(i);
                             System.out.println("Pass send: "+m.message);
