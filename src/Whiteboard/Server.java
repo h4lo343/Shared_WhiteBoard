@@ -88,17 +88,13 @@ public class Server {
                     }
 
                     for (int i=0 ; i<sockets.size() ; i++) {
-
                         if (i == socketNum) {
                             continue;
                         }
-                        else {
                             ObjectOutputStream oos = ObjectOutputs.get(i);
                             System.out.println("Pass send: "+m.message);
                             oos.writeObject(m);
                             oos.flush();
-                        }
-
                     }
 
                 } catch (IOException | ClassNotFoundException e)  {
