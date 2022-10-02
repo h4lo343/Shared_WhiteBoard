@@ -149,11 +149,7 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
             x = x1;
             y = y1;
 
-            // recover the normal stroke and color
-            graph.setStroke(new BasicStroke(3));
-            graphSave.setStroke(new BasicStroke(3));
-            graph.setColor(this.currentColor);
-            graphSave.setColor(this.currentColor);
+
         }
     }
 
@@ -254,12 +250,24 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
 
         graph.drawLine(x, y, x1, y1);
         graphSave.drawLine(x, y, x1, y1);
+
+        // recover the normal stroke and color
+        graph.setStroke(new BasicStroke(3));
+        graphSave.setStroke(new BasicStroke(3));
+        graph.setColor(this.currentColor);
+        graphSave.setColor(this.currentColor);
     }
 
     // draw rectangle method
     public void drawRectangle(int x, int x2, int y, int y2, Color color) {
+        graph.setColor(color);
+        graphSave.setColor(color);
+
         graph.drawRect(Math.min(x, x2), Math.min(y, y2), Math.abs(x2 - x), Math.abs(y2 - y));
         graphSave.drawRect(Math.min(x, x2), Math.min(y, y2), Math.abs(x2 - x), Math.abs(y2 - y));
+
+        graph.setColor(currentColor);
+        graphSave.setColor(currentColor);
     }
 
     // draw text method
