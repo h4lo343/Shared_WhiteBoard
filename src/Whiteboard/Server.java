@@ -17,10 +17,10 @@ import java.util.LinkedList;
  * @date 2022/9/30 13:14
  */
 public class Server {
-    LinkedList<Socket> sockets = new LinkedList<Socket>(); // the socket list used to store client sockets
-    LinkedList<Shapes> shapes = new LinkedList<Shapes>(); // the list used to store all the shapes on the canvas
-    LinkedList<ObjectOutputStream> ObjectOutputs = new LinkedList<ObjectOutputStream>();
-    LinkedList<ObjectInputStream> ObjectInputs = new LinkedList<ObjectInputStream>();
+    ArrayList<Socket> sockets = new ArrayList<Socket>(); // the socket list used to store client sockets
+    ArrayList<Shapes> shapes = new ArrayList<Shapes>(); // the list used to store all the shapes on the canvas
+    ArrayList<ObjectOutputStream> ObjectOutputs = new ArrayList<ObjectOutputStream>();
+    ArrayList<ObjectInputStream> ObjectInputs = new ArrayList<ObjectInputStream>();
 
     public static void main(String[] args) throws IOException, InterruptedException {
         Server s = new Server();
@@ -88,20 +88,25 @@ public class Server {
                     }
 
                     for (int i=0 ; i<sockets.size() ; i++) {
-                        System.out.println(sockets.size()-1);
+
                         if (i == socketNum) {
                             continue;
                         }
+
+                        if(sockets.get(i)!=null) {
                             ObjectOutputStream oos = ObjectOutputs.get(i);
                             System.out.println("Pass send: "+m.message);
                             oos.writeObject(m);
                             oos.flush();
+                        }
+
                     }
 
                 } catch (IOException | ClassNotFoundException e)  {
-                    sockets.remove(socketNum);
-                    ObjectOutputs.remove(socketNum);
-                    ObjectInputs.remove(socketNum);
+                    // if one client exited, set it socket position and I/O in lists as null
+                    sockets.set(socketNum, null);
+                    ObjectOutputs.set(socketNum, null);
+                    ObjectInputs.set(socketNum, null);
                     e.printStackTrace();
                     break;
                 }
