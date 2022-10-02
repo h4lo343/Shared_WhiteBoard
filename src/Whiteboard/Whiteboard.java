@@ -361,10 +361,15 @@ public class Whiteboard {
 
                                 case "Circle":
                                     this.listener.drawCircle(shape.x, shape.x1, shape.y, shape.y1, shape.color);
+                                    break;
 
                                 case "Rectangle":
                                     this.listener.drawRectangle(shape.x, shape.x1, shape.y, shape.y1, shape.color);
+                                    break;
 
+                                case "Eraser":
+                                    this.listener.drawEraser(shape.x,shape.y,shape.x1,shape.y1);
+                                    break;
                             }
                         }
 
