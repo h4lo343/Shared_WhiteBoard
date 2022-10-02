@@ -90,10 +90,12 @@ public class Server {
                     for (int i=0 ; i<sockets.size() ; i++) {
 
                         if (i == socketNum) {
+                            System.out.println("continue: "+i);
                             continue;
                         }
 
                         if(sockets.get(i)!=null) {
+                            System.out.println("------"+i+"-----");
                             ObjectOutputStream oos = ObjectOutputs.get(i);
                             System.out.println("Pass send: "+m.message);
                             oos.writeObject(m);
