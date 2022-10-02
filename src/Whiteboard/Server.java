@@ -70,7 +70,7 @@ public class Server {
             while (true) {
                 try {
                     Message m =((Message) oi.readObject());
-                    System.out.println(m.message);
+                    System.out.println("receive:"+ m.message);
                     // if the message is a shape, save it in the shape list
                     if(m instanceof Shapes) {
                         shapes.add((Shapes)m);
@@ -79,10 +79,15 @@ public class Server {
                     for (int i=0 ; i<sockets.size() ; i++) {
 
                         if (i == socketNum) {
-                            continue;
+                            ObjectOutputStream oos = ObjectOutputs.get(i);
+                            System.out.println("Pass send: "+m.message);
+                            oos.writeObject(m);
+                            oos.flush();
+//                            continue;
                         }
                         else {
                             ObjectOutputStream oos = ObjectOutputs.get(i);
+                            System.out.println("Pass send: "+m.message);
                             oos.writeObject(m);
                             oos.flush();
                         }
@@ -103,10 +108,23 @@ public class Server {
     // if a client joined, send it all the shapes stored in shapelist to init
     // the canvas of that client
     public void Init(int socketNum) throws IOException {
-        ObjectOutputStream os = ObjectOutputs.get(socketNum);
-        for (int i = 0; i<shapes.size();i++) {
-            os.writeObject(shapes.get(i));
-            os.flush();
-        }
+
+        Thread init = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ObjectOutputStream os = ObjectOutputs.get(socketNum);
+                for (int i = 0; i<shapes.size();i++) {
+
+                    try {
+                        System.out.println("init send: "+shapes.get(i).message);
+                        os.writeObject(shapes.get(i));
+                        os.flush();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+         init.start();
     }
 }
