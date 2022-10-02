@@ -311,6 +311,8 @@ public class Whiteboard {
         // set default stroke
         g.setStroke(new BasicStroke(3));
         graphSave.setStroke(new BasicStroke(3));
+        // set default color
+        l.setColor(Color.BLACK);
         l.setGraphSave(graphSave);
         l.setGraph(g);
         l.setOutPutStream(this.os);
