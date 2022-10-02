@@ -39,17 +39,6 @@ public class Server {
             ObjectInputs.add(new ObjectInputStream(client.getInputStream()));
             ObjectOutputs.add(new ObjectOutputStream(client.getOutputStream()));
 
-//            // receive the hello message, and get the userID
-//            try {
-//                Message hello = (Message) ois.readObject();
-//                System.out.println("received a client: "+hello.senderID);
-//            } catch (ClassNotFoundException e) {
-//                e.printStackTrace();
-//            }
-
-            // load new client with current stored shapes
-            Init(sockets.size()-1);
-
             // open monitor for that client
             Monitor monitor = new Monitor(sockets.size()-1);
             monitor.start();
@@ -63,6 +52,7 @@ public class Server {
         int socketNum;
         ObjectInputStream oi;
         ObjectOutputStream os;
+        String userID;
         public Monitor(int socketNum) {
             this.socketNum = socketNum;
             Socket s = sockets.get(socketNum);
@@ -78,6 +68,10 @@ public class Server {
                     // receive the hello message and get the user's ID
                     if (m.message.equals("Hello")) {
                         System.out.println("a new client connected: "+m.senderID);
+                        userID = m.senderID;
+
+                        // load new client with current stored shapes
+                        Init(sockets.size()-1);
                     }
 
                     // if the message is a shape, save it in the shape list, and
@@ -85,6 +79,7 @@ public class Server {
                     // make the canvas concurrent
                     if(m instanceof Shapes) {
                         shapes.add((Shapes)m);
+                        System.out.println("receive: "+m.message);
                         for (int i=0 ; i<sockets.size() ; i++) {
                             if (i == socketNum) {
                                 continue;
@@ -99,6 +94,13 @@ public class Server {
 
                 } catch (IOException | ClassNotFoundException e)  {
                     e.printStackTrace();
+                    System.out.println("User left the room: "+userID);
+                    // move the socket and I/O in the list
+                    sockets.remove(socketNum);
+                    ObjectInputs.remove(socketNum);
+                    ObjectOutputs.remove(socketNum);
+                    break;
+
                 }
             }
         }
@@ -108,7 +110,8 @@ public class Server {
     // the canvas of that client
     public void Init(int socketNum) throws IOException {
         ObjectOutputStream os = ObjectOutputs.get(socketNum);
-        for (int i = 0; i<shapes.size()-1;i++) {
+        for (int i = 0; i<shapes.size();i++) {
+            System.out.println("send: "+shapes.get(i).message);
             os.writeObject(shapes.get(i));
             os.flush();
         }

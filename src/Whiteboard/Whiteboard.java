@@ -36,6 +36,7 @@ public class Whiteboard {
         wb.start();
 
     }
+
     //"100.93.54.162"
     public void start() throws IOException {
 
@@ -52,19 +53,13 @@ public class Whiteboard {
 
         // create a random userName, and set it to class and listener
         StringBuffer sb = new StringBuffer();
-        for (int i=0; i<6 ; i++) {
-            char c =(char)( new Random().nextInt(26)+'a' ) ;
+        for (int i = 0; i < 6; i++) {
+            char c = (char) (new Random().nextInt(26) + 'a');
             sb.append(c);
         }
         String userID = new String(sb);
         this.userID = userID;
         listener.setUserID(userID);
-
-        // invoke method on listener, send hello to server
-        listener.sendHello();
-
-
-
 
         // open a receiver
         Receive r = new Receive(s, l);
@@ -334,6 +329,10 @@ public class Whiteboard {
         l.setGraph(g);
         l.setOutPutStream(this.os);
 
+        // when codes reach here, it means the client has started all the GUI and monitor thread
+        // send hello to server
+        // invoke method on listener, send hello to server
+        l.sendHello();
     }
 
     // the class for board to receive message from server
@@ -357,6 +356,7 @@ public class Whiteboard {
                     // if the message is a shape, then it must be the shaped drawn by other peer
                     // draw these shapes on its own canvas using different drawing methods
                     if (m instanceof Shapes) {
+                        System.out.println(m.message);
                         if (m instanceof normalShape) {
                             normalShape shape = (normalShape) m;
                             String type = m.message;
@@ -380,7 +380,8 @@ public class Whiteboard {
                                 case "Rectangle":
                                     this.listener.drawRectangle(shape.x, shape.x1, shape.y, shape.y1, shape.color);
 
-                                default: return;
+                                default:
+                                    return;
                             }
                         }
                         if (m instanceof textShape) {

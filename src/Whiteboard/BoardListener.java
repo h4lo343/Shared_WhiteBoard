@@ -153,11 +153,7 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
             x = x1;
             y = y1;
 
-            // recover the normal stroke and color
-            graph.setStroke(new BasicStroke(3));
-            graphSave.setStroke(new BasicStroke(3));
-            graph.setColor(this.currentColor);
-            graphSave.setColor(this.currentColor);
+
         }
     }
 
@@ -169,7 +165,14 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
     // the method is used to send shapes(triangle, rectangle, circle, pen, line)
     public void sendShape(String message, int x, int x1, int y, int y1) {
         try {
-            Message m = new normalShape(message, userID, x, x1, y, y1, currentColor);
+            Message m;
+            // if the requester is an eraser, we have to set the color as white
+            if(message.equals("Eraser")) {
+                 m = new normalShape(message, userID, x, x1, y, y1, Color.WHITE);
+            }
+            else {
+                 m = new normalShape(message, userID, x, x1, y, y1, currentColor);
+            }
             oos.writeObject(m);
             oos.flush();
 
@@ -244,7 +247,6 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
 
     // method that performs eraser function
     public void drawEraser(int x, int y, int x1, int y1) {
-
         // set the eraser color as white
         // to cover paints
         graph.setColor(Color.WHITE);
@@ -254,6 +256,12 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
 
         graph.drawLine(x, y, x1, y1);
         graphSave.drawLine(x, y, x1, y1);
+
+        // recover the normal stroke and color
+        graph.setStroke(new BasicStroke(3));
+        graphSave.setStroke(new BasicStroke(3));
+        graph.setColor(this.currentColor);
+        graphSave.setColor(this.currentColor);
     }
 
     // draw rectangle method
@@ -274,8 +282,9 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
         graphSave.setColor(currentColor);
     }
 
-    // the message for client to send hello message with its id t
-    // to the server
+    // when the ui and monitor thread in client has been fully started,
+    // send hello message to inform server start I/O connections and
+    // start to sending old shapes
     public void sendHello() {
         Message hello = new Message("Hello", userID);
         try {
@@ -284,7 +293,8 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
+
+
 }
 
