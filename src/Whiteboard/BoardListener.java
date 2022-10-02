@@ -207,8 +207,12 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
         graph.drawLine(x, y, x1, y1);
         graphSave.drawLine(x, y, x1, y1);
 
+        // restore the previous color and stroke
         graph.setColor(currentColor);
         graphSave.setColor(currentColor);
+
+        graph.setStroke(new BasicStroke(3));
+        graphSave.setStroke(new BasicStroke(3));
     }
 
 
