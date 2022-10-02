@@ -20,13 +20,13 @@ public class Server {
     ArrayList<ObjectOutputStream> ObjectOutputs = new ArrayList<ObjectOutputStream>();
     ArrayList<ObjectInputStream> ObjectInputs = new ArrayList<ObjectInputStream>();
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         Server s = new Server();
         s.run();
 
     }
 
-    public void run() throws IOException {
+    public void run() throws IOException, InterruptedException {
         System.out.println("server is online on: "+ InetAddress.getLocalHost().getHostAddress());
         ServerSocket s = new ServerSocket(8888);
 
@@ -39,6 +39,8 @@ public class Server {
             ObjectInputs.add(new ObjectInputStream(client.getInputStream()));
             ObjectOutputs.add(new ObjectOutputStream(client.getOutputStream()));
             System.out.println("received a client");
+
+            Thread.sleep(1500);
 
             // load new client with current stored shapes
             Init(sockets.size()-1);
