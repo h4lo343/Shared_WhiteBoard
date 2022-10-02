@@ -42,7 +42,7 @@ public class Server {
             ObjectOutputs.add(new ObjectOutputStream(client.getOutputStream()));
             System.out.println("received a client");
 
-
+            Thread.sleep(500);
             // load new client with current stored shapes
             Init(sockets.size()-1);
 
