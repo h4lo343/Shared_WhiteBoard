@@ -43,8 +43,19 @@ public class Server {
             System.out.println("received a client");
 
             Thread.sleep(500);
-            // load new client with current stored shapes
-            Init(sockets.size()-1);
+            Thread init = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    // load new client with current stored shapes
+                    try {
+                        Init(sockets.size()-1);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+            init.start();
 
             // open monitor for that client
             Monitor monitor = new Monitor(sockets.size()-1);
@@ -108,23 +119,11 @@ public class Server {
     // if a client joined, send it all the shapes stored in shapelist to init
     // the canvas of that client
     public void Init(int socketNum) throws IOException {
-
-        Thread init = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                ObjectOutputStream os = ObjectOutputs.get(socketNum);
-                for (int i = 0; i<shapes.size();i++) {
-
-                    try {
-                        System.out.println("init send: "+shapes.get(i).message);
-                        os.writeObject(shapes.get(i));
-                        os.flush();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-         init.start();
+        ObjectOutputStream os = ObjectOutputs.get(socketNum);
+        for (int i = 0; i<shapes.size();i++) {
+            System.out.println("init send: "+shapes.get(i).message);
+            os.writeObject(shapes.get(i));
+            os.flush();
+        }
     }
 }
