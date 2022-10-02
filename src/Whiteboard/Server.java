@@ -88,6 +88,7 @@ public class Server {
                     }
 
                     for (int i=0 ; i<sockets.size() ; i++) {
+                        System.out.println(sockets.size()-1);
                         if (i == socketNum) {
                             continue;
                         }
@@ -113,7 +114,7 @@ public class Server {
     public void Init(int socketNum) throws IOException {
         ObjectOutputStream os = ObjectOutputs.get(socketNum);
         for (int i = 0; i<shapes.size();i++) {
-            System.out.println("init send: "+shapes.get(i).message);
+//            System.out.println("init send: "+shapes.get(i).message);
             os.writeObject(shapes.get(i));
             os.flush();
         }
