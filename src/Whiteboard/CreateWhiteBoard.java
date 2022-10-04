@@ -41,7 +41,7 @@ public class CreateWhiteBoard {
 
     public void start() throws IOException {
         //"100.93.54.162"
-        Socket s = new Socket( InetAddress.getLocalHost(), 8888);
+        Socket s = new Socket( "100.93.54.162", 8888);
 
         this.s = s;
         this.is = s.getInputStream();
@@ -436,7 +436,7 @@ public class CreateWhiteBoard {
 
         ObjectInputStream ois;
         BoardListener listener;
-        DefaultListModel userList;
+        DefaultListModel ModelUserList;
 
         public Receive(InputStream is, BoardListener listener) throws IOException {
             this.listener = listener;
@@ -445,7 +445,7 @@ public class CreateWhiteBoard {
         }
 
         public void setUserList(DefaultListModel userList) {
-            this.userList = userList;
+            this.ModelUserList = userList;
         }
 
         @Override
@@ -541,12 +541,14 @@ public class CreateWhiteBoard {
                             case "updateUserList":
 
                                 ArrayList<String> userlist = ((UserListUpdate) m).userList;
+                                System.out.println(userlist.size());
                                 // clean the old userlist and update the new list
-                                this.userList.clear();
-                                for(String i:userlist) {
-                                    System.out.println(i);
-                                   this.userList.addElement(i);
+                                this.ModelUserList.clear();
+                                for (int i = 0; i<userlist.size(); i++){
+                                    System.out.println(userlist.get(i));
+                                    this.ModelUserList.addElement(userlist.get(i));
                                 }
+
 
                                 break;
 
