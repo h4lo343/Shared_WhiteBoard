@@ -95,6 +95,7 @@ public class Server {
                     // server has to tell the client whether is has been invited
                     if (m.message.equals("reply")) {
                         JoinReply reply = (JoinReply)m;
+                        System.out.println("received reply: "+reply.agree);
                         ObjectOutputStream oos = ObjectOutputs.get(reply.socketNum);
                         if (reply.agree) {
                             oos.writeObject(new JoinResponse("response", "server", true ));

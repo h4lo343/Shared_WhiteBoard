@@ -6,7 +6,7 @@ import java.io.Serializable;
  * @author XIANGNAN ZHOU_1243072
  * @date 2022/10/4 16:10
  */
-public class JoinRequest extends Shapes implements Serializable {
+public class JoinRequest extends Message implements Serializable {
     public String joiner;
     public int socketNum;
     public JoinRequest(String message, String senderID, String joiner, int socketNum) {

@@ -481,6 +481,7 @@ public class CreateWhiteBoard {
                                 break;
 
                             case "response":
+                                System.out.println("received response: "+((JoinResponse) m).agree);
                                 JoinResponse response = (JoinResponse) m;
                                 System.out.println(response.agree);
                         }
