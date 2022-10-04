@@ -193,6 +193,7 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
             Message m = new JoinReply("reply", senderID,socketNum, agree);
             oos.writeObject(m);
             oos.flush();
+            System.out.println("send reply to server");
         } catch (IOException e) {
             e.printStackTrace();
         }

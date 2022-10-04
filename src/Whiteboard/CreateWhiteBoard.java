@@ -468,7 +468,6 @@ public class CreateWhiteBoard {
                                 break;
 
                             case "request":
-
                                 String ip = ((JoinRequest)m).joiner;
                                 System.out.println("get access request from server for: "+ ((JoinRequest)m).joiner);
                                 int input = JOptionPane.showConfirmDialog(null, "client: "+ ip+" wants to join the board:","Agree or not", JOptionPane.YES_NO_OPTION);
