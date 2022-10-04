@@ -75,7 +75,7 @@ public class CreateWhiteBoard {
                             showed = true;
                         }
                     }
-                    if (l.authorized == true) {
+                    if (l.authorized == true || l.approved == true) {
                         try {
                             boardUI();
                             break;
@@ -481,8 +481,17 @@ public class CreateWhiteBoard {
 
                             case "response":
                                 System.out.println("received response: "+((JoinResponse) m).agree);
-                                JoinResponse response = (JoinResponse) m;
-                                System.out.println(response.agree);
+                                Boolean response = ((JoinResponse) m).agree ;
+
+                                if (response) {
+                                    l.setApproved();
+                                    JOptionPane.showMessageDialog(null, "you have been appproved by manager");
+                                }
+                                else {
+                                    JOptionPane.showMessageDialog(null, "you are rejected by manager");
+                                }
+
+
                         }
                     }
 

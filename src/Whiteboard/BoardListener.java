@@ -33,6 +33,10 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
         this.graph = g;
     }
 
+    public void setApproved() {
+        this.approved = true;
+    }
+
     public void setGraphSave(Graphics2D g) {
         this.graphSave = g;
     }
