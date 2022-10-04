@@ -15,6 +15,7 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Random;
 
 /**
@@ -40,7 +41,7 @@ public class CreateWhiteBoard {
 
     public void start() throws IOException {
 
-        Socket s = new Socket( "100.93.54.162", 8888);
+        Socket s = new Socket( InetAddress.getLocalHost(), 8888);
 
         this.s = s;
         this.is = s.getInputStream();
@@ -452,104 +453,121 @@ public class CreateWhiteBoard {
             System.out.println("receiver started");
             while (true) {
                 try {
-                    Message m = (Message) this.ois.readObject();
-                    // if the message is a shape, then it must be the shaped drawn by other peer
-                    // draw these shapes on its own canvas using different drawing methods
-                    if (m instanceof Shapes) {
-                        if (m instanceof normalShape) {
-                            normalShape shape = (normalShape) m;
-                            String type = m.message;
-                            // the switch is used to judge the type of shape
-                            switch (type) {
-                                case "Line":
-                                    this.listener.drawStraightLine(shape.x, shape.y, shape.x1, shape.y1, shape.color);
+                    Object o = this.ois.readObject();
+
+                    if (o instanceof  LinkedList) {
+                        LinkedList userlist = (LinkedList) o;
+                        // clean the old userlist and update the new list
+                        System.out.println("----"+userlist.size());
+                        this.ModelUserList.clear();
+                        for (int i = 0; i<userlist.size(); i++){
+                            System.out.println(userlist.get(i));
+                            this.ModelUserList.addElement(userlist.get(i));
+                        }
+                    }
+
+                    if (o instanceof Message) {
+                        Message m = (Message) o;
+                        // if the message is a shape, then it must be the shaped drawn by other peer
+                        // draw these shapes on its own canvas using different drawing methods
+                        if (m instanceof Shapes) {
+                            if (m instanceof normalShape) {
+                                normalShape shape = (normalShape) m;
+                                String type = m.message;
+                                // the switch is used to judge the type of shape
+                                switch (type) {
+                                    case "Line":
+                                        this.listener.drawStraightLine(shape.x, shape.y, shape.x1, shape.y1, shape.color);
+                                        break;
+
+                                    case "Pen":
+                                        this.listener.drawPen(shape.x, shape.y, shape.x1, shape.y1, shape.color);
+                                        break;
+
+                                    case "Triangle":
+                                        this.listener.drawTriangle(shape.x, shape.x1, shape.y, shape.y1, shape.color);
+                                        break;
+
+                                    case "Circle":
+                                        this.listener.drawCircle(shape.x, shape.x1, shape.y, shape.y1, shape.color);
+                                        break;
+
+                                    case "Rectangle":
+                                        this.listener.drawRectangle(shape.x, shape.x1, shape.y, shape.y1, shape.color);
+                                        break;
+
+                                    case "Eraser":
+                                        this.listener.drawEraser(shape.x,shape.y,shape.x1,shape.y1);
+                                        break;
+                                }
+                            }
+
+                            else if (m instanceof textShape) {
+                                textShape text = (textShape) m;
+                                System.out.println(text.text);
+                                this.listener.drawText(text.x, text.y, text.text, text.color);
+                            }
+
+                        }
+                        // if the message is not in shape type
+                        // solve them in the else
+                        else {
+                            String message = m.message;
+
+                            switch (message) {
+                                // if it is an authorization message
+                                // set the authorized state in listener as true
+                                // to indicate this client is a manager
+                                case "authorization" :
+                                    l.setAuthorized();
+                                    JOptionPane.showMessageDialog(null, "you are the manager");
                                     break;
 
-                                case "Pen":
-                                    this.listener.drawPen(shape.x, shape.y, shape.x1, shape.y1, shape.color);
+                                case "request":
+                                    String ip = ((JoinRequest)m).joiner;
+                                    System.out.println("get access request from server for: "+ ((JoinRequest)m).joiner);
+                                    int input = JOptionPane.showConfirmDialog(null, "client: "+ ip+" wants to join the board:","Agree or not", JOptionPane.YES_NO_OPTION);
+                                    if (input == 0) {
+                                        l.sendReply(((JoinRequest)m).socketNum,true);
+                                        break;
+                                    }
+                                    else {
+                                        l.sendReply(((JoinRequest)m).socketNum,false);
+                                        break;
+                                    }
+
+
+                                case "response":
+                                    System.out.println("received response: "+((JoinResponse) m).agree);
+                                    Boolean response = ((JoinResponse) m).agree ;
+
+                                    if (response) {
+                                        l.setApproved();
+                                        JOptionPane.showMessageDialog(null, "you have been appproved by manager");
+                                        break;
+                                    }
+                                    else {
+                                        JOptionPane.showMessageDialog(null, "you are rejected by manager");
+                                        break;
+                                    }
+
+
+                                case "updateUserList":
+                                    // clean the old userlist and update the new list
+                                    this.ModelUserList.clear();
+                                    for (int i = 0; i<((UserListUpdate) m).userList.size(); i++){
+                                        System.out.println(((UserListUpdate) m).userList.get(i));
+                                        this.ModelUserList.addElement(((UserListUpdate) m).userList.get(i));
+                                    }
                                     break;
 
-                                case "Triangle":
-                                    this.listener.drawTriangle(shape.x, shape.x1, shape.y, shape.y1, shape.color);
-                                    break;
-
-                                case "Circle":
-                                    this.listener.drawCircle(shape.x, shape.x1, shape.y, shape.y1, shape.color);
-                                    break;
-
-                                case "Rectangle":
-                                    this.listener.drawRectangle(shape.x, shape.x1, shape.y, shape.y1, shape.color);
-                                    break;
-
-                                case "Eraser":
-                                    this.listener.drawEraser(shape.x,shape.y,shape.x1,shape.y1);
-                                    break;
                             }
                         }
 
-                        else if (m instanceof textShape) {
-                            textShape text = (textShape) m;
-                            System.out.println(text.text);
-                            this.listener.drawText(text.x, text.y, text.text, text.color);
-                        }
-
-                        }
-                    // if the message is not in shape type
-                    // solve them in the else
-                    else {
-                        String message = m.message;
-
-                        switch (message) {
-                            // if it is an authorization message
-                            // set the authorized state in listener as true
-                            // to indicate this client is a manager
-                            case "authorization" :
-                                l.setAuthorized();
-                                JOptionPane.showMessageDialog(null, "you are the manager");
-                                break;
-
-                            case "request":
-                                String ip = ((JoinRequest)m).joiner;
-                                System.out.println("get access request from server for: "+ ((JoinRequest)m).joiner);
-                                int input = JOptionPane.showConfirmDialog(null, "client: "+ ip+" wants to join the board:","Agree or not", JOptionPane.YES_NO_OPTION);
-                                if (input == 0) {
-                                    l.sendReply(((JoinRequest)m).socketNum,true);
-                                    break;
-                                }
-                                else {
-                                    l.sendReply(((JoinRequest)m).socketNum,false);
-                                    break;
-                                }
-
-
-                            case "response":
-                                System.out.println("received response: "+((JoinResponse) m).agree);
-                                Boolean response = ((JoinResponse) m).agree ;
-
-                                if (response) {
-                                    l.setApproved();
-                                    JOptionPane.showMessageDialog(null, "you have been appproved by manager");
-                                    break;
-                                }
-                                else {
-                                    JOptionPane.showMessageDialog(null, "you are rejected by manager");
-                                    break;
-                                }
-
-
-                            case "updateUserList":
-
-                                System.out.println(((UserListUpdate) m).userList.size() + "times: "+ ((UserListUpdate) m).i);
-                                // clean the old userlist and update the new list
-                                this.ModelUserList.clear();
-                                for (int i = 0; i<((UserListUpdate) m).userList.size(); i++){
-                                    System.out.println(((UserListUpdate) m).userList.get(i));
-                                    this.ModelUserList.addElement(((UserListUpdate) m).userList.get(i));
-                                }
-                                break;
-
-                        }
                     }
+
+
+
 
 
                 } catch (IOException | ClassNotFoundException e) {

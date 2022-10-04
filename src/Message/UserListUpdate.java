@@ -10,10 +10,8 @@ import java.util.LinkedList;
  */
 public class UserListUpdate extends Message implements Serializable {
     public LinkedList<String> userList;
-    public int i;
-    public UserListUpdate(String message, String senderID, LinkedList<String> userList, int i) {
+    public UserListUpdate(String message, String senderID, LinkedList<String> userList) {
         super(message, senderID);
         this.userList = userList;
-        this.i=i;
     }
 }
