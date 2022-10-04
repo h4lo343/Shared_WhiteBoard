@@ -96,10 +96,27 @@ public class Server {
                         System.out.println("received a client: " + m.senderID);
                         userID.add(m.senderID);
 
+                        // after receivd hello from client, start to init
+                        // client's canvas with previous shapes
+                        Thread init = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                // load new client with current stored shapes
+                                try {
+                                    Init(sockets.size()-1);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+
+                        init.start();
+
                         // after receive a hello from a client, update the userID list
                         // and send all clients the latest id list
                         for (int i = 0; i<sockets.size(); i++) {
                             if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
+                                System.out.println("send: "+ sockets.get(i).getLocalAddress()+" :"+userID.size());
                                 ObjectOutputStream oos = ObjectOutputs.get(i);
                                 oos.writeObject(new UserListUpdate("updateUserList", "server", userID));
                                 oos.flush();
@@ -123,21 +140,7 @@ public class Server {
 
                     }
 
-                        // after receivd hello from client, start to init
-                        // client's canvas with previous shapes
-                        Thread init = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                // load new client with current stored shapes
-                                try {
-                                    Init(sockets.size()-1);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
 
-                        init.start();
 
 
                     // if the message is a shape, save it in the shape list

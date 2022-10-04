@@ -539,10 +539,12 @@ public class CreateWhiteBoard {
 
 
                             case "updateUserList":
+
                                 ArrayList<String> userlist = ((UserListUpdate) m).userList;
                                 // clean the old userlist and update the new list
                                 this.userList.clear();
                                 for(String i:userlist) {
+                                    System.out.println(i);
                                    this.userList.addElement(i);
                                 }
 
