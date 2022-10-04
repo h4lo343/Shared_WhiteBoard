@@ -1,9 +1,6 @@
 package Whiteboard;
 
-import Message.Message;
-import Message.normalShape;
-import Message.Shapes;
-import Message.textShape;
+import Message.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -42,11 +39,10 @@ public class CreateWhiteBoard {
         this.is = s.getInputStream();
         this.os = s.getOutputStream();
 
-
         // init the listener
         BoardListener listener = new BoardListener();
         this.l = listener;
-
+        l.setOutPutStream(this.os);
 
         // open a receiver, the reason to put it in a thread is:
         // if not do this, it would block the boot of gut in the next lines
@@ -56,7 +52,7 @@ public class CreateWhiteBoard {
                 // open a receiver
                 Receive r = null;
                 try {
-                    r = new Receive(s, l);
+                    r = new Receive(is, l);
                     r.start();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -65,23 +61,34 @@ public class CreateWhiteBoard {
         });
         t.start();
 
-        Thread check = new Thread(new Runnable() {
-            boolean showed = false;
+
+        Thread checker = new Thread(new Runnable() {
             @Override
             public void run() {
+                boolean showed = false;
                 while(true) {
                     if(l.authorized==false&&l.approved==false) {
+                        System.out.println(l.authorized);
                         if (showed == false) {
                             // only show once of the window
                             JOptionPane.showMessageDialog(null, "wait to be approved by manager or be the manager");
                             showed = true;
                         }
-
+                    }
+                    if (l.authorized == true) {
+                        try {
+                            boardUI();
+                            break;
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
         });
-        boardUI();
+        checker.start();
+
+
     }
 
     public void boardUI() throws IOException {
@@ -138,7 +145,21 @@ public class CreateWhiteBoard {
         save.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // checker whether the operator is manager
+                if (l.authorized == false) {
+                    JOptionPane.showMessageDialog(null, "wait to be approved by manager or be the manager");
+                }
+            }
+        });
 
+        newCanva.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // checker whether the operator is manager
+                if (l.authorized == false) {
+                    JOptionPane.showMessageDialog(null, "wait to be approved by manager or be the manager");
+                }
+                canva.repaint();
             }
         });
 
@@ -146,6 +167,10 @@ public class CreateWhiteBoard {
         openCanva.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // checker whether the operator is manager
+                if (l.authorized == false) {
+                    JOptionPane.showMessageDialog(null, "wait to be approved by manager or be the manager");
+                }
                 // empty the current canva
                 canva.repaint();
 
@@ -181,6 +206,10 @@ public class CreateWhiteBoard {
         saveAsJpg.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // checker whether the operator is manager
+                if (l.authorized == false) {
+                    JOptionPane.showMessageDialog(null, "wait to be approved by manager or be the manager");
+                }
                 JFileChooser saveAs = new JFileChooser("Save As .jpg");
                 saveAs.setDialogTitle("Save as JPG");
                 saveAs.showSaveDialog(null);
@@ -201,6 +230,10 @@ public class CreateWhiteBoard {
         saveAsPng.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // checker whether the operator is manager
+                if (l.authorized == false) {
+                    JOptionPane.showMessageDialog(null, "wait to be approved by manager or be the manager");
+                }
                 JFileChooser saveAs = new JFileChooser("Save As .png");
                 saveAs.setDialogTitle("Save as PNG");
                 saveAs.showSaveDialog(null);
@@ -347,7 +380,7 @@ public class CreateWhiteBoard {
         l.setColor(Color.BLACK);
         l.setGraphSave(graphSave);
         l.setGraph(g);
-        l.setOutPutStream(this.os);
+
 
         // create a random username, assign it to listener
         StringBuffer sb = new StringBuffer();
@@ -366,16 +399,18 @@ public class CreateWhiteBoard {
         ObjectInputStream ois;
         BoardListener listener;
 
-        public Receive(Socket s, BoardListener listener) throws IOException {
-            this.ois = new ObjectInputStream(new BufferedInputStream(s.getInputStream()));
+        public Receive(InputStream is, BoardListener listener) throws IOException {
             this.listener = listener;
+
+            this.ois = new ObjectInputStream(new BufferedInputStream(is));
+
         }
 
         @Override
         public void run() {
+            System.out.println("receiver started");
             while (true) {
                 try {
-
                     Message m = (Message) this.ois.readObject();
 
                     // if the message is a shape, then it must be the shaped drawn by other peer
@@ -422,7 +457,6 @@ public class CreateWhiteBoard {
                     // if the message is not in shape type
                     // solve them in the else
                     else {
-
                         String message = m.message;
                         switch (message) {
                             // if it is an authorization message
@@ -432,6 +466,21 @@ public class CreateWhiteBoard {
                                 l.setAuthorized();
                                 JOptionPane.showMessageDialog(null, "you are the manager");
                                 break;
+
+                            case "request":
+                                String ip = ((JoinRequest)m).joiner;
+                                int input = JOptionPane.showConfirmDialog(null, "client: "+ ip+" wants to join the board:","Agree or not", JOptionPane.YES_NO_OPTION);
+                                if (input == 0) {
+                                    l.sendReply(((JoinRequest)m).socketNum,true);
+                                }
+                                else {
+                                    l.sendReply(((JoinRequest)m).socketNum,false);
+                                }
+                                break;
+
+                            case "response":
+                                JoinResponse response = (JoinResponse) m;
+                                System.out.println(response.agree);
                         }
                     }
 

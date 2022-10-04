@@ -1,8 +1,7 @@
 package Whiteboard;
 
-import Message.Message;
-import Message.normalShape;
-import Message.textShape;
+import Message.*;
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -186,8 +185,19 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
+
+    // the method is for manager to send reply to server for new coming client
+    public void sendReply(int socketNum, boolean agree) {
+        try {
+            Message m = new JoinReply("reply", senderID,socketNum, agree);
+            oos.writeObject(m);
+            oos.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     // send hello message to server
     public void sendHello() {

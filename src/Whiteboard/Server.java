@@ -1,9 +1,7 @@
 package Whiteboard;
 
-import Message.Message;
-import Message.normalShape;
-import Message.Shapes;
-import Message.textShape;
+import Message.*;
+
 
 import java.io.*;
 import java.net.InetAddress;
@@ -22,7 +20,6 @@ public class Server {
     ArrayList<ObjectOutputStream> ObjectOutputs = new ArrayList<ObjectOutputStream>();
     ArrayList<ObjectInputStream> ObjectInputs = new ArrayList<ObjectInputStream>();
     ArrayList<String> userID = new ArrayList<String>();
-    boolean manager = false;
     int managerIndex;
 
     public static void main(String[] args) throws IOException, InterruptedException {
@@ -38,6 +35,7 @@ public class Server {
         // open a while loop to take any incoming request
         while(true) {
             Socket client = s.accept();
+            System.out.println("receive client");
 
             // put client socket into the socket list
             sockets.add(client);
@@ -45,20 +43,21 @@ public class Server {
             ObjectOutputs.add(new ObjectOutputStream(client.getOutputStream()));
 
 
-            Thread.sleep(500);
-            Thread init = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    // load new client with current stored shapes
-                    try {
-                        Init(sockets.size()-1);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-
-            init.start();
+            // if the user is the first in the server, give
+            // the user the manager authority
+            if (sockets.size()==1) {
+                ObjectOutputStream oos = ObjectOutputs.get(sockets.size()-1);
+                oos.writeObject(new Message("authorization", "server"));
+                System.out.println("send manager authorization");
+                // record the position of manager socket in list
+                managerIndex = sockets.size()-1;
+                oos.flush();
+            }
+            // if it is the normal client, ask manager whether to let the client join
+            else {
+                ObjectOutputStream oos = ObjectOutputs.get(managerIndex);
+                oos.writeObject(new JoinRequest("request", "server", client.getInetAddress().toString(),sockets.size()-1 ));
+            }
 
             // open monitor for that client
             Monitor monitor = new Monitor(sockets.size()-1);
@@ -91,14 +90,37 @@ public class Server {
                         System.out.println("received a client: "+m.senderID);
                         userID.add(m.senderID);
 
-                        // if the user is the first in the server, give
-                        // the user the manager authority
-                        if (sockets.size()==1) {
-                            ObjectOutputStream oos = ObjectOutputs.get(socketNum);
-                            oos.writeObject(new Message("authorization", "server"));
+                    // if the message is a joinReply from manager
+                    // server has to tell the client whether is has been invited
+                    if (m.message.equals("reply")) {
+                        JoinReply reply = (JoinReply)m;
+                        ObjectOutputStream oos = ObjectOutputs.get(reply.socketNum);
+                        if (reply.agree) {
+                            oos.writeObject(new JoinResponse("response", "server", true ));
+                            oos.flush();
+                        }
+                        else {
+                            oos.writeObject(new JoinResponse("response", "server", false ));
                             oos.flush();
                         }
 
+                    }
+
+                        // after receivd hello from client, start to init
+                        // client's canvas with previous shapes
+                        Thread init = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                // load new client with current stored shapes
+                                try {
+                                    Init(sockets.size()-1);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+
+                        init.start();
                     }
 
                     // if the message is a shape, save it in the shape list
