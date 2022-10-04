@@ -4,6 +4,8 @@ import Message.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,6 +14,7 @@ import java.awt.image.ImageObserver;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -24,6 +27,9 @@ public class CreateWhiteBoard {
     Socket s;
     InputStream is;
     OutputStream os;
+    String [] userList;
+    Receive receiver;
+
 
     public static void main(String[] args) throws IOException {
 
@@ -34,7 +40,8 @@ public class CreateWhiteBoard {
 
 
     public void start() throws IOException {
-        Socket s = new Socket("100.93.54.162", 8888);
+        //"100.93.54.162"
+        Socket s = new Socket( InetAddress.getLocalHost(), 8888);
 
         this.s = s;
         this.is = s.getInputStream();
@@ -54,6 +61,7 @@ public class CreateWhiteBoard {
                 Receive r = null;
                 try {
                     r = new Receive(is, l);
+                    receiver = r;
                     r.start();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -147,7 +155,7 @@ public class CreateWhiteBoard {
             public void actionPerformed(ActionEvent e) {
                 // checker whether the operator is manager
                 if (l.authorized == false) {
-                    JOptionPane.showMessageDialog(null, "wait to be approved by manager or be the manager");
+                    JOptionPane.showMessageDialog(null, "only manager can do this");
                 }
             }
         });
@@ -157,7 +165,7 @@ public class CreateWhiteBoard {
             public void actionPerformed(ActionEvent e) {
                 // checker whether the operator is manager
                 if (l.authorized == false) {
-                    JOptionPane.showMessageDialog(null, "wait to be approved by manager or be the manager");
+                    JOptionPane.showMessageDialog(null, "only manager can do this");
                 }
                 canva.repaint();
             }
@@ -169,7 +177,7 @@ public class CreateWhiteBoard {
             public void actionPerformed(ActionEvent e) {
                 // checker whether the operator is manager
                 if (l.authorized == false) {
-                    JOptionPane.showMessageDialog(null, "wait to be approved by manager or be the manager");
+                    JOptionPane.showMessageDialog(null, "only manager can do this");
                 }
                 // empty the current canva
                 canva.repaint();
@@ -208,7 +216,7 @@ public class CreateWhiteBoard {
             public void actionPerformed(ActionEvent e) {
                 // checker whether the operator is manager
                 if (l.authorized == false) {
-                    JOptionPane.showMessageDialog(null, "wait to be approved by manager or be the manager");
+                    JOptionPane.showMessageDialog(null, "only manager can do this");
                 }
                 JFileChooser saveAs = new JFileChooser("Save As .jpg");
                 saveAs.setDialogTitle("Save as JPG");
@@ -232,7 +240,7 @@ public class CreateWhiteBoard {
             public void actionPerformed(ActionEvent e) {
                 // checker whether the operator is manager
                 if (l.authorized == false) {
-                    JOptionPane.showMessageDialog(null, "wait to be approved by manager or be the manager");
+                    JOptionPane.showMessageDialog(null, "only manager can do this");
                 }
                 JFileChooser saveAs = new JFileChooser("Save As .png");
                 saveAs.setDialogTitle("Save as PNG");
@@ -361,12 +369,38 @@ public class CreateWhiteBoard {
         board.add(userList, BorderLayout.EAST);
         JLabel list = new JLabel("User List:");
         userList.add(list);
-        JTextArea listArea = new JTextArea();
-        listArea.setPreferredSize(new Dimension(200, 400));
-        userList.add(listArea);
-        listArea.setEditable(false);
-        listArea.setWrapStyleWord(true);
-        listArea.setLineWrap(true);
+        DefaultListModel modelUserList = new DefaultListModel();
+        JList List = new JList(modelUserList);
+        this.receiver.setUserList(modelUserList);
+
+        List.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (l.authorized == false) {
+                    JOptionPane.showMessageDialog(null, "only manager can do this");
+                }
+                else {
+                    int input = JOptionPane.showConfirmDialog(null, "Do you really want to kick user: "+ List.getSelectedValue(),"Kick", JOptionPane.YES_NO_OPTION);
+                    if (input == 0) {
+
+                    }
+                    else {
+
+                    }
+                }
+            }
+        });
+        List.setPreferredSize(new Dimension(200, 400));
+        userList.add(List);
+
+
+
+//        JTextArea listArea = new JTextArea();
+//        listArea.setPreferredSize(new Dimension(200, 400));
+//        userList.add(listArea);
+//        listArea.setEditable(false);
+//        listArea.setWrapStyleWord(true);
+//        listArea.setLineWrap(true);
 
 
         // create graphics object for the canvas
@@ -393,17 +427,25 @@ public class CreateWhiteBoard {
 
     }
 
+    public void listProducer(String [] userList) {
+
+    }
+
     // the class for board to receive message from server
     public class Receive extends Thread {
 
         ObjectInputStream ois;
         BoardListener listener;
+        DefaultListModel userList;
 
         public Receive(InputStream is, BoardListener listener) throws IOException {
             this.listener = listener;
 
             this.ois = new ObjectInputStream(new BufferedInputStream(is));
+        }
 
+        public void setUserList(DefaultListModel userList) {
+            this.userList = userList;
         }
 
         @Override
@@ -412,7 +454,6 @@ public class CreateWhiteBoard {
             while (true) {
                 try {
                     Message m = (Message) this.ois.readObject();
-
                     // if the message is a shape, then it must be the shaped drawn by other peer
                     // draw these shapes on its own canvas using different drawing methods
                     if (m instanceof Shapes) {
@@ -458,6 +499,7 @@ public class CreateWhiteBoard {
                     // solve them in the else
                     else {
                         String message = m.message;
+
                         switch (message) {
                             // if it is an authorization message
                             // set the authorized state in listener as true
@@ -473,11 +515,13 @@ public class CreateWhiteBoard {
                                 int input = JOptionPane.showConfirmDialog(null, "client: "+ ip+" wants to join the board:","Agree or not", JOptionPane.YES_NO_OPTION);
                                 if (input == 0) {
                                     l.sendReply(((JoinRequest)m).socketNum,true);
+                                    break;
                                 }
                                 else {
                                     l.sendReply(((JoinRequest)m).socketNum,false);
+                                    break;
                                 }
-                                break;
+
 
                             case "response":
                                 System.out.println("received response: "+((JoinResponse) m).agree);
@@ -486,10 +530,23 @@ public class CreateWhiteBoard {
                                 if (response) {
                                     l.setApproved();
                                     JOptionPane.showMessageDialog(null, "you have been appproved by manager");
+                                    break;
                                 }
                                 else {
                                     JOptionPane.showMessageDialog(null, "you are rejected by manager");
+                                    break;
                                 }
+
+
+                            case "updateUserList":
+                                ArrayList<String> userlist = ((UserListUpdate) m).userList;
+                                // clean the old userlist and update the new list
+                                this.userList.clear();
+                                for(String i:userlist) {
+                                   this.userList.addElement(i);
+                                }
+
+                                break;
 
 
                         }

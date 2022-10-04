@@ -20,6 +20,7 @@ public class Server {
     ArrayList<ObjectOutputStream> ObjectOutputs = new ArrayList<ObjectOutputStream>();
     ArrayList<ObjectInputStream> ObjectInputs = new ArrayList<ObjectInputStream>();
     ArrayList<String> userID = new ArrayList<String>();
+
     int managerIndex;
 
     public static void main(String[] args) throws IOException, InterruptedException {
@@ -41,6 +42,10 @@ public class Server {
             sockets.add(client);
             ObjectInputs.add(new ObjectInputStream(client.getInputStream()));
             ObjectOutputs.add(new ObjectOutputStream(client.getOutputStream()));
+
+            // new ObjectInputStream， new ObjectOutputStream usually time sometime, for
+            // the list consistent, wait for 1 second
+            Thread.sleep(1000);
 
 
             // if the user is the first in the server, give
@@ -84,13 +89,22 @@ public class Server {
             while (true) {
                 try {
                     Message m =((Message) oi.readObject());
-                    System.out.println("-----"+m.message);
 
                     // if the server receive a hello message,
                     // get the sender's ID and store it in list
                     if (m.message.equals("Hello")) {
                         System.out.println("received a client: " + m.senderID);
                         userID.add(m.senderID);
+
+                        // after receive a hello from a client, update the userID list
+                        // and send all clients the latest id list
+                        for (int i = 0; i<sockets.size(); i++) {
+                            if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
+                                ObjectOutputStream oos = ObjectOutputs.get(i);
+                                oos.writeObject(new UserListUpdate("updateUserList", "server", userID));
+                                oos.flush();
+                            }
+                        }
                     }
                     // if the message is a joinReply from manager
                     // server has to tell the client whether is has been invited
@@ -158,6 +172,19 @@ public class Server {
                     ObjectOutputs.set(socketNum, null);
                     ObjectInputs.set(socketNum, null);
                     userID.set(socketNum, null);
+
+                    // once a client leave, we have to send all other clients the updated userlist
+                   try {
+                       for (int i = 0; i<sockets.size(); i++) {
+                           if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
+                               ObjectOutputStream oos = ObjectOutputs.get(i);
+                               oos.writeObject(new UserListUpdate("updateUserList", "server", userID));
+                               oos.flush();
+                           }
+                       }
+                   } catch (Exception e2) {
+                       e2.printStackTrace();
+                   }
                     e.printStackTrace();
                     break;
                 }
