@@ -21,6 +21,9 @@ public class Server {
     ArrayList<Shapes> shapes = new ArrayList<Shapes>(); // the list used to store all the shapes on the canvas
     ArrayList<ObjectOutputStream> ObjectOutputs = new ArrayList<ObjectOutputStream>();
     ArrayList<ObjectInputStream> ObjectInputs = new ArrayList<ObjectInputStream>();
+    ArrayList<String> userID = new ArrayList<String>();
+    boolean manager = false;
+    int managerIndex;
 
     public static void main(String[] args) throws IOException, InterruptedException {
         Server s = new Server();
@@ -40,7 +43,7 @@ public class Server {
             sockets.add(client);
             ObjectInputs.add(new ObjectInputStream(client.getInputStream()));
             ObjectOutputs.add(new ObjectOutputStream(client.getOutputStream()));
-            System.out.println("received a client");
+
 
             Thread.sleep(500);
             Thread init = new Thread(new Runnable() {
@@ -82,22 +85,41 @@ public class Server {
                 try {
                     Message m =((Message) oi.readObject());
 
+                    // if the server receive a hello message,
+                    // get the sender's ID and store it in list
+                    if (m.message.equals("Hello")) {
+                        System.out.println("received a client: "+m.senderID);
+                        userID.add(m.senderID);
+
+                        // if the user is the first in the server, give
+                        // the user the manager authority
+                        if (sockets.size()==1) {
+                            ObjectOutputStream oos = ObjectOutputs.get(socketNum);
+                            oos.writeObject(new Message("authorization", "server"));
+                            oos.flush();
+                        }
+
+                    }
+
                     // if the message is a shape, save it in the shape list
                     if(m instanceof Shapes) {
                         shapes.add((Shapes)m);
                     }
 
                     for (int i=0 ; i<sockets.size() ; i++) {
-                        System.out.println(sockets.size());
+
                         if (i == socketNum) {
-                            System.out.println("continue: "+i);
                             continue;
                         }
 
+                        // here we need to check whether the sockets list's size equal's to the outputStream list' size
+                        // because sometimes, such situation would happen: socket has been created and pushed to the
+                        // list, however, outputStream takes a bit longer time which would lead to a outOfBound error
+                        // in line: ObjectOutputStream oos = ObjectOutputs.get(i) as the outputStream list has not
+                        // been incremented yet
                         if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
-                            System.out.println("------"+i+"-----");
+
                             ObjectOutputStream oos = ObjectOutputs.get(i);
-                            System.out.println("Pass send: "+m.message);
                             oos.writeObject(m);
                             oos.flush();
                         }
@@ -105,10 +127,12 @@ public class Server {
                     }
 
                 } catch (IOException | ClassNotFoundException e)  {
-                    // if one client exited, set it socket position and I/O in lists as null
+                    // if one client exited, set its socket position and I/O position in lists as null
+                    System.out.println("client left: "+userID.get(socketNum));
                     sockets.set(socketNum, null);
                     ObjectOutputs.set(socketNum, null);
                     ObjectInputs.set(socketNum, null);
+                    userID.set(socketNum, null);
                     e.printStackTrace();
                     break;
                 }
@@ -121,7 +145,7 @@ public class Server {
     public void Init(int socketNum) throws IOException {
         ObjectOutputStream os = ObjectOutputs.get(socketNum);
         for (int i = 0; i<shapes.size();i++) {
-//            System.out.println("init send: "+shapes.get(i).message);
+
             os.writeObject(shapes.get(i));
             os.flush();
         }

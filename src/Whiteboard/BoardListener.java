@@ -26,6 +26,9 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
     OutputStream os;
     ObjectOutputStream oos;
     String senderID;
+    boolean approved = false;
+
+    boolean authorized = false;
 
     public void setGraph(Graphics2D g) {
         this.graph = g;
@@ -42,6 +45,10 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
     public void setPenType(String t) {
         this.penType = t;
     }
+
+    public void setSenderID(String i) { this.senderID = i; }
+
+    public void setAuthorized() { this.authorized = true; this.approved = true;}
 
     public void setText(String t) {
         this.text = t;
@@ -161,7 +168,7 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
     // the method is used to send shapes(triangle, rectangle, circle, pen, line)
     public void sendShape(String message, int x, int x1, int y, int y1) {
         try {
-            Message m = new normalShape(message, "1", x, x1, y, y1, currentColor);
+            Message m = new normalShape(message, senderID, x, x1, y, y1, currentColor);
             oos.writeObject(m);
             oos.flush();
 
@@ -173,13 +180,24 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
     // the method is used to send different text shape
     public void sendText(String message, int x2, int y2, String text) {
         try {
-            Message m = new textShape(message, "1", x2, y2, text, currentColor);
+            Message m = new textShape(message, senderID, x2, y2, text, currentColor);
             oos.writeObject(m);
             oos.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+    }
+
+    // send hello message to server
+    public void sendHello() {
+        try {
+            Message m = new Message("Hello", this.senderID);
+            oos.writeObject(m);
+            oos.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     // draw straight line method

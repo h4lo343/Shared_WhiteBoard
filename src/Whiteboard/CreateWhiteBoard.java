@@ -15,41 +15,73 @@ import java.awt.image.ImageObserver;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.Random;
 
 /**
  * @author XIANGNAN ZHOU_1243072
  * @date 2022/9/27 22:32
  */
-public class Whiteboard {
+public class CreateWhiteBoard {
     Graphics2D g;
     BoardListener l;
     Socket s;
     InputStream is;
     OutputStream os;
 
-
     public static void main(String[] args) throws IOException {
 
-        Whiteboard wb = new Whiteboard();
+        CreateWhiteBoard wb = new CreateWhiteBoard();
         wb.start();
 
     }
     //"100.93.54.162"
     public void start() throws IOException {
-        Socket s = new Socket("10.13.102.149", 8888);
+        Socket s = new Socket(InetAddress.getLocalHost(), 8888);
 
         this.s = s;
         this.is = s.getInputStream();
         this.os = s.getOutputStream();
 
+
         // init the listener
         BoardListener listener = new BoardListener();
         this.l = listener;
-        boardUI();
 
-        // open a receiver
-        Receive r = new Receive(s, l);
-        r.start();
+
+        // open a receiver, the reason to put it in a thread is:
+        // if not do this, it would block the boot of gut in the next lines
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // open a receiver
+                Receive r = null;
+                try {
+                    r = new Receive(s, l);
+                    r.start();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        t.start();
+
+        Thread check = new Thread(new Runnable() {
+            boolean showed = false;
+            @Override
+            public void run() {
+                while(true) {
+                    if(l.authorized==false&&l.approved==false) {
+                        if (showed == false) {
+                            // only show once of the window
+                            JOptionPane.showMessageDialog(null, "wait to be approved by manager or be the manager");
+                            showed = true;
+                        }
+
+                    }
+                }
+            }
+        });
+        boardUI();
     }
 
     public void boardUI() throws IOException {
@@ -58,7 +90,7 @@ public class Whiteboard {
          * init the overall whiteboard interface
          */
         JFrame board = new JFrame();
-        board.setTitle("Shared Whiteboard");
+        board.setTitle("Shared CreateWhiteBoard");
         board.setSize(1200, 800);
         board.setLocationRelativeTo(null);
         board.setVisible(true);
@@ -317,6 +349,14 @@ public class Whiteboard {
         l.setGraph(g);
         l.setOutPutStream(this.os);
 
+        // create a random username, assign it to listener
+        StringBuffer sb = new StringBuffer();
+        for (int i=0;i<=5;i++) {
+            sb.append(((char)(new Random().nextInt(26)+'A')));
+        }
+        String id = new String(sb);
+        l.setSenderID(id);
+        l.sendHello();
 
     }
 
@@ -338,16 +378,13 @@ public class Whiteboard {
 
                     Message m = (Message) this.ois.readObject();
 
-
                     // if the message is a shape, then it must be the shaped drawn by other peer
                     // draw these shapes on its own canvas using different drawing methods
                     if (m instanceof Shapes) {
-
                         if (m instanceof normalShape) {
-                            System.out.println(m.message);
                             normalShape shape = (normalShape) m;
                             String type = m.message;
-
+                            // the switch is used to judge the type of shape
                             switch (type) {
                                 case "Line":
                                     this.listener.drawStraightLine(shape.x, shape.y, shape.x1, shape.y1, shape.color);
@@ -375,15 +412,29 @@ public class Whiteboard {
                             }
                         }
 
-                        if (m instanceof textShape) {
+                        else if (m instanceof textShape) {
                             textShape text = (textShape) m;
                             System.out.println(text.text);
                             this.listener.drawText(text.x, text.y, text.text, text.color);
                         }
 
+                        }
+                    // if the message is not in shape type
+                    // solve them in the else
+                    else {
 
+                        String message = m.message;
+                        switch (message) {
+                            // if it is an authorization message
+                            // set the authorized state in listener as true
+                            // to indicate this client is a manager
+                            case "authorization" :
+                                l.setAuthorized();
+                                JOptionPane.showMessageDialog(null, "you are the manager");
+                                break;
+                        }
                     }
-                    // the switch is used to judge the type of shape
+
 
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
