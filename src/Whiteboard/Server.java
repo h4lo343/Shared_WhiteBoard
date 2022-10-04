@@ -114,6 +114,9 @@ public class Server {
                         // after receive a hello from a client, update the userID list
                         // and send all clients the latest id list
                         for (int i = 0; i<sockets.size(); i++) {
+                            if(iii==2) {
+                                userID.set(0,"abcdefg");
+                            }
                             if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
                                 System.out.println("send: "+ sockets.get(i).getInetAddress()+" :"+userID.size());
                                 for (int j =0;j<userID.size();j++) {

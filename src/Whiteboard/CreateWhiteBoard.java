@@ -546,10 +546,7 @@ public class CreateWhiteBoard {
                                     System.out.println(((UserListUpdate) m).userList.get(i));
                                     this.ModelUserList.addElement(((UserListUpdate) m).userList.get(i));
                                 }
-
-
                                 break;
-
 
                         }
                     }
