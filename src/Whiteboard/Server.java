@@ -89,9 +89,9 @@ public class Server {
                     // if the server receive a hello message,
                     // get the sender's ID and store it in list
                     if (m.message.equals("Hello")) {
-                        System.out.println("received a client: "+m.senderID);
+                        System.out.println("received a client: " + m.senderID);
                         userID.add(m.senderID);
-
+                    }
                     // if the message is a joinReply from manager
                     // server has to tell the client whether is has been invited
                     if (m.message.equals("reply")) {
@@ -124,7 +124,7 @@ public class Server {
                         });
 
                         init.start();
-                    }
+
 
                     // if the message is a shape, save it in the shape list
                     if(m instanceof Shapes) {
