@@ -27,7 +27,6 @@ public class CreateWhiteBoard {
     Socket s;
     InputStream is;
     OutputStream os;
-    String [] userList;
     Receive receiver;
 
 
@@ -539,7 +538,6 @@ public class CreateWhiteBoard {
 
 
                             case "updateUserList":
-
 
                                 System.out.println(((UserListUpdate) m).userList.size() + "times: "+ ((UserListUpdate) m).i);
                                 // clean the old userlist and update the new list

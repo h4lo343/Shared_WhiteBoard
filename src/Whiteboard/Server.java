@@ -19,7 +19,7 @@ public class Server {
     ArrayList<Shapes> shapes = new ArrayList<Shapes>(); // the list used to store all the shapes on the canvas
     ArrayList<ObjectOutputStream> ObjectOutputs = new ArrayList<ObjectOutputStream>();
     ArrayList<ObjectInputStream> ObjectInputs = new ArrayList<ObjectInputStream>();
-    ArrayList<String> userID = new ArrayList<String>();
+    LinkedList<String> userID = new LinkedList<String>();
     int iii=1;
 
     int managerIndex;
