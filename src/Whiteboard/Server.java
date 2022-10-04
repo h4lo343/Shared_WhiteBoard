@@ -84,6 +84,7 @@ public class Server {
             while (true) {
                 try {
                     Message m =((Message) oi.readObject());
+                    System.out.println("-----"+m.message);
 
                     // if the server receive a hello message,
                     // get the sender's ID and store it in list
