@@ -20,6 +20,7 @@ public class Server {
     ArrayList<ObjectOutputStream> ObjectOutputs = new ArrayList<ObjectOutputStream>();
     ArrayList<ObjectInputStream> ObjectInputs = new ArrayList<ObjectInputStream>();
     ArrayList<String> userID = new ArrayList<String>();
+    int iii=1;
 
     int managerIndex;
 
@@ -43,9 +44,9 @@ public class Server {
             ObjectInputs.add(new ObjectInputStream(client.getInputStream()));
             ObjectOutputs.add(new ObjectOutputStream(client.getOutputStream()));
 
-            // new ObjectInputStream， new ObjectOutputStream usually time sometime, for
-            // the list consistent, wait for 1 second
-            Thread.sleep(1000);
+//            // new ObjectInputStream， new ObjectOutputStream usually time sometime, for
+//            // the list consistent, wait for 1 second
+//            Thread.sleep(1000);
 
 
             // if the user is the first in the server, give
@@ -119,10 +120,11 @@ public class Server {
                                     System.out.println(userID.get(j));
                                 }
                                 ObjectOutputStream oos = ObjectOutputs.get(i);
-                                oos.writeObject(new UserListUpdate("updateUserList", "server", userID));
+                                oos.writeObject(new UserListUpdate("updateUserList", "server", userID,iii));
                                 oos.flush();
                             }
                         }
+                        iii+=1;
                     }
                     // if the message is a joinReply from manager
                     // server has to tell the client whether is has been invited

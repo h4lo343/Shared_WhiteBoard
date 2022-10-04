@@ -9,8 +9,10 @@ import java.util.ArrayList;
  */
 public class UserListUpdate extends Message implements Serializable {
     public ArrayList<String> userList;
-    public UserListUpdate(String message, String senderID, ArrayList<String> userList) {
+    public int i;
+    public UserListUpdate(String message, String senderID, ArrayList<String> userList, int i) {
         super(message, senderID);
         this.userList = userList;
+        this.i=i;
     }
 }

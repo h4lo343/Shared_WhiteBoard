@@ -40,7 +40,7 @@ public class CreateWhiteBoard {
 
 
     public void start() throws IOException {
-        //"100.93.54.162"
+
         Socket s = new Socket( "100.93.54.162", 8888);
 
         this.s = s;
@@ -541,7 +541,7 @@ public class CreateWhiteBoard {
                             case "updateUserList":
 
 
-                                System.out.println(((UserListUpdate) m).userList.size());
+                                System.out.println(((UserListUpdate) m).userList.size() + "times: "+ ((UserListUpdate) m).i);
                                 // clean the old userlist and update the new list
                                 this.ModelUserList.clear();
                                 for (int i = 0; i<((UserListUpdate) m).userList.size(); i++){
