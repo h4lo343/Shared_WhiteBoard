@@ -56,6 +56,7 @@ public class Server {
             // if it is the normal client, ask manager whether to let the client join
             else {
                 ObjectOutputStream oos = ObjectOutputs.get(managerIndex);
+                System.out.println("send request to manager: "+ userID.get(managerIndex));
                 oos.writeObject(new JoinRequest("request", "server", client.getInetAddress().toString(),sockets.size()-1 ));
             }
 

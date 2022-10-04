@@ -31,9 +31,10 @@ public class CreateWhiteBoard {
         wb.start();
 
     }
-    //"100.93.54.162"
+
+
     public void start() throws IOException {
-        Socket s = new Socket(InetAddress.getLocalHost(), 8888);
+        Socket s = new Socket("100.93.54.162", 8888);
 
         this.s = s;
         this.is = s.getInputStream();
@@ -68,7 +69,6 @@ public class CreateWhiteBoard {
                 boolean showed = false;
                 while(true) {
                     if(l.authorized==false&&l.approved==false) {
-                        System.out.println(l.authorized);
                         if (showed == false) {
                             // only show once of the window
                             JOptionPane.showMessageDialog(null, "wait to be approved by manager or be the manager");
@@ -468,7 +468,9 @@ public class CreateWhiteBoard {
                                 break;
 
                             case "request":
+
                                 String ip = ((JoinRequest)m).joiner;
+                                System.out.println("get access request from server for: "+ ((JoinRequest)m).joiner);
                                 int input = JOptionPane.showConfirmDialog(null, "client: "+ ip+" wants to join the board:","Agree or not", JOptionPane.YES_NO_OPTION);
                                 if (input == 0) {
                                     l.sendReply(((JoinRequest)m).socketNum,true);
