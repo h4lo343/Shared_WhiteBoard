@@ -116,7 +116,10 @@ public class Server {
                         // and send all clients the latest id list
                         for (int i = 0; i<sockets.size(); i++) {
                             if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
-                                System.out.println("send: "+ sockets.get(i).getLocalAddress()+" :"+userID.get(0)+"||"+ userID.get(1));
+                                System.out.println("send: "+ sockets.get(i).getLocalAddress()+" :"+userID.size());
+                                for (int j =0;j<userID.size();j++) {
+                                    System.out.println(userID.get(j));
+                                }
                                 ObjectOutputStream oos = ObjectOutputs.get(i);
                                 oos.writeObject(new UserListUpdate("updateUserList", "server", userID));
                                 oos.flush();
