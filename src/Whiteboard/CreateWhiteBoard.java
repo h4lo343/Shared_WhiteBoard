@@ -543,7 +543,7 @@ public class CreateWhiteBoard {
                                 ArrayList<String> userlist = ((UserListUpdate) m).userList;
                                 System.out.println(userlist.size());
                                 // clean the old userlist and update the new list
-                                this.ModelUserList.clear();
+//                                this.ModelUserList.clear();
                                 for (int i = 0; i<userlist.size(); i++){
                                     System.out.println(userlist.get(i));
                                     this.ModelUserList.addElement(userlist.get(i));

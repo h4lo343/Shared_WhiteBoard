@@ -53,7 +53,6 @@ public class Server {
             if (sockets.size()==1) {
                 ObjectOutputStream oos = ObjectOutputs.get(sockets.size()-1);
                 oos.writeObject(new Message("authorization", "server"));
-                System.out.println("send manager authorization");
                 // record the position of manager socket in list
                 managerIndex = sockets.size()-1;
                 oos.flush();
@@ -61,7 +60,6 @@ public class Server {
             // if it is the normal client, ask manager whether to let the client join
             else {
                 ObjectOutputStream oos = ObjectOutputs.get(managerIndex);
-                System.out.println("send request to manager: "+ userID.get(managerIndex));
                 oos.writeObject(new JoinRequest("request", "server", client.getInetAddress().toString(),sockets.size()-1 ));
             }
 
@@ -116,7 +114,7 @@ public class Server {
                         // and send all clients the latest id list
                         for (int i = 0; i<sockets.size(); i++) {
                             if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
-                                System.out.println("send: "+ sockets.get(i).getLocalAddress()+" :"+userID.size());
+                                System.out.println("send: "+ sockets.get(i).getInetAddress()+" :"+userID.size());
                                 for (int j =0;j<userID.size();j++) {
                                     System.out.println(userID.get(j));
                                 }
@@ -130,7 +128,6 @@ public class Server {
                     // server has to tell the client whether is has been invited
                     if (m.message.equals("reply")) {
                         JoinReply reply = (JoinReply)m;
-                        System.out.println("received reply: "+reply.agree);
                         ObjectOutputStream oos = ObjectOutputs.get(reply.socketNum);
                         if (reply.agree) {
                             oos.writeObject(new JoinResponse("response", "server", true ));
@@ -142,8 +139,6 @@ public class Server {
                         }
 
                     }
-
-
 
 
                     // if the message is a shape, save it in the shape list
@@ -180,17 +175,17 @@ public class Server {
                     userID.set(socketNum, null);
 
                     // once a client leave, we have to send all other clients the updated userlist
-                   try {
-                       for (int i = 0; i<sockets.size(); i++) {
-                           if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
-                               ObjectOutputStream oos = ObjectOutputs.get(i);
-                               oos.writeObject(new UserListUpdate("updateUserList", "server", userID));
-                               oos.flush();
-                           }
-                       }
-                   } catch (Exception e2) {
-                       e2.printStackTrace();
-                   }
+//                   try {
+//                       for (int i = 0; i<sockets.size(); i++) {
+//                           if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
+//                               ObjectOutputStream oos = ObjectOutputs.get(i);
+//                               oos.writeObject(new UserListUpdate("updateUserList", "server", userID));
+//                               oos.flush();
+//                           }
+//                       }
+//                   } catch (Exception e2) {
+//                       e2.printStackTrace();
+//                   }
                     e.printStackTrace();
                     break;
                 }
