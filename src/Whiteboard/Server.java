@@ -115,10 +115,13 @@ public class Server {
                         // and send all clients the latest id list
                         for (int i = 0; i<sockets.size(); i++) {
                             if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
-                                System.out.println("send new user id: "+m.senderID);
                                 ObjectOutputStream oos = ObjectOutputs.get(i);
-                                oos.writeObject(new UserListUpdate("updateUserList", "server", m.senderID, "add"));
-                                oos.flush();
+                                for (int j =0;j<userID.size();j++) {
+                                    if(userID.get(j)!=null) {
+                                        oos.writeObject(new UserListUpdate("updateUserList", "server", userID.get(j), "add"));
+                                        oos.flush();
+                                    }
+                                }
                             }
                         }
 
