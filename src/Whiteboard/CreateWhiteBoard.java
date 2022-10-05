@@ -512,7 +512,6 @@ public class CreateWhiteBoard {
 
                             else if (m instanceof textShape) {
                                 textShape text = (textShape) m;
-                                System.out.println(text.text);
                                 this.listener.drawText(text.x, text.y, text.text, text.color);
                             }
 
@@ -533,7 +532,6 @@ public class CreateWhiteBoard {
 
                                 case "request":
                                     String ip = ((JoinRequest)m).joiner;
-                                    System.out.println("get access request from server for: "+ ((JoinRequest)m).joiner);
                                     int input = JOptionPane.showConfirmDialog(null, "client: "+ ip+" wants to join the board:","Agree or not", JOptionPane.YES_NO_OPTION);
                                     if (input == 0) {
                                         l.sendReply(((JoinRequest)m).socketNum,true);
@@ -591,6 +589,7 @@ public class CreateWhiteBoard {
 
                                     case "chat":
                                         ChatMessage chat = (ChatMessage)m;
+                                        System.out.println(chat.chatContent+"-------");
                                         String id = chat.senderID;
                                         String content = chat.chatContent;
                                         // set the if because sometimes the receiver starts before the
