@@ -203,6 +203,13 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
         }
     }
 
+    // for manager user to send kick request to server
+    public void sendKick(String userID) throws IOException {
+        KickRequest kick = new KickRequest("kick", senderID, userID);
+        System.out.println("send kick request for user: "+userID);
+        oos.writeObject(kick);
+        oos.flush();
+    }
 
     // send hello message to server
     public void sendHello() {

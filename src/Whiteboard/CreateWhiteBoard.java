@@ -41,7 +41,8 @@ public class CreateWhiteBoard {
 
     public void start() throws IOException {
         //"100.93.54.162"
-        Socket s = new Socket( "10.13.102.149", 8888);
+        //"10.13.102.149"
+        Socket s = new Socket( InetAddress.getLocalHost(), 8888);
 
         this.s = s;
         this.is = s.getInputStream();
@@ -379,13 +380,17 @@ public class CreateWhiteBoard {
                 if (l.authorized == false) {
                     JOptionPane.showMessageDialog(null, "only manager can do this");
                 }
+                if (List.getSelectedValue().equals(l.senderID)) {
+                    JOptionPane.showMessageDialog(null, "You can not kick yourself");
+                }
                 else {
                     int input = JOptionPane.showConfirmDialog(null, "Do you really want to kick user: "+ List.getSelectedValue(),"Kick", JOptionPane.YES_NO_OPTION);
                     if (input == 0) {
-
-                    }
-                    else {
-
+                        try {
+                            l.sendKick((String) List.getSelectedValue());
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
                     }
                 }
             }
@@ -540,7 +545,6 @@ public class CreateWhiteBoard {
                                         break;
                                     }
 
-
                                     case "updateUserList":
                                         UserListUpdate updateMessage = (UserListUpdate)m;
                                         String type = updateMessage.type;
@@ -565,8 +569,11 @@ public class CreateWhiteBoard {
                                                 }
                                             }
                                         }
+                                        break;
 
-                                    break;
+                                    case "kick":
+                                        JOptionPane.showMessageDialog(null, "you are kicked by manager");
+                                        System.exit(0);
 
                             }
                         }

@@ -126,6 +126,30 @@ public class Server {
                         }
 
                     }
+                    // response to kick request from manager, remove that user
+                    // let send him a inform
+                    if (m.message.equals("kick")) {
+                        KickRequest k = (KickRequest)m;
+                        System.out.println("receive kick for: "+k.userID);
+
+                        int kickedIndex=0;
+                        // first look for that user in list
+                        for (int i =0;i<userID.size();i++) {
+                            if (k.userID.equals(userID.get(i))){
+                                kickedIndex=i;
+                            }
+                        }
+                        ObjectOutputStream oos = ObjectOutputs.get(kickedIndex);
+                        oos.writeObject(new Message("kick","server"));
+                        oos.flush();
+
+                        //remove that user
+                        sockets.set(kickedIndex, null);
+                        ObjectOutputs.set(kickedIndex, null);
+                        ObjectInputs.set(kickedIndex, null);
+                        userID.set(kickedIndex,null);
+                    }
+
                     // if the message is a joinReply from manager
                     // server has to tell the client whether is has been invited
                     if (m.message.equals("reply")) {
