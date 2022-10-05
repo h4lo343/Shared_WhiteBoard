@@ -42,7 +42,7 @@ public class CreateWhiteBoard {
     public void start() throws IOException {
         //"100.93.54.162"
         //"10.13.102.149"
-        Socket s = new Socket( InetAddress.getLocalHost(), 8888);
+        Socket s = new Socket( "100.93.54.162", 8888);
 
         this.s = s;
         this.is = s.getInputStream();
@@ -546,7 +546,6 @@ public class CreateWhiteBoard {
 
 
                                 case "response":
-                                    System.out.println("received response: "+((JoinResponse) m).agree);
                                     Boolean response = ((JoinResponse) m).agree ;
 
                                     if (response) {
@@ -594,7 +593,13 @@ public class CreateWhiteBoard {
                                         ChatMessage chat = (ChatMessage)m;
                                         String id = chat.senderID;
                                         String content = chat.chatContent;
-                                        MessageWindow.addElement(id+": "+content);
+                                        // set the if because sometimes the receiver starts before the
+                                        // initialization of the messageWindow which would cause a
+                                        // null pointer fault
+                                        if (MessageWindow !=null) {
+                                            MessageWindow.addElement(id+": "+content);
+                                        }
+
                                         break;
 
 
