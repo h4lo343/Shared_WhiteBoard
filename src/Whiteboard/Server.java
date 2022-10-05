@@ -17,8 +17,8 @@ import java.util.LinkedList;
 public class Server {
     ArrayList<Socket> sockets = new ArrayList<Socket>(); // the socket list used to store client sockets
     ArrayList<Shapes> shapes = new ArrayList<Shapes>(); // the list used to store all the shapes on the canvas
-    ArrayList<ObjectOutputStream> ObjectOutputs = new ArrayList<ObjectOutputStream>();
-    ArrayList<ObjectInputStream> ObjectInputs = new ArrayList<ObjectInputStream>();
+    ArrayList<MyObjectOutPutStream> ObjectOutputs = new ArrayList<MyObjectOutPutStream>();
+    ArrayList<MyObjectInputStream> ObjectInputs = new ArrayList<MyObjectInputStream>();
     LinkedList<String> userID = new LinkedList<String>();
 
 
@@ -41,8 +41,8 @@ public class Server {
 
             // put client socket into the socket list
             sockets.add(client);
-            ObjectInputs.add(new ObjectInputStream(client.getInputStream()));
-            ObjectOutputs.add(new ObjectOutputStream(client.getOutputStream()));
+            ObjectInputs.add(new MyObjectInputStream(client.getInputStream()));
+            ObjectOutputs.add(new MyObjectOutPutStream(client.getOutputStream()));
 
 //            // new ObjectInputStream， new ObjectOutputStream usually time sometime, for
 //            // the list consistent, wait for 1 second

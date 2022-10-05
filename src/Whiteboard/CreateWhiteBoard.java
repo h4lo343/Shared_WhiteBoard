@@ -42,7 +42,7 @@ public class CreateWhiteBoard {
     public void start() throws IOException {
         //"100.93.54.162"
         //"10.13.102.149"
-        Socket s = new Socket( "10.13.102.149", 8888);
+        Socket s = new Socket( InetAddress.getLocalHost(), 8888);
 
         this.s = s;
         this.is = s.getInputStream();
@@ -441,14 +441,14 @@ public class CreateWhiteBoard {
     // the class for board to receive message from server
     public class Receive extends Thread {
 
-        ObjectInputStream ois;
+        MyObjectInputStream ois;
         BoardListener listener;
         DefaultListModel ModelUserList;
 
         public Receive(InputStream is, BoardListener listener) throws IOException {
             this.listener = listener;
 
-            this.ois = new ObjectInputStream(new BufferedInputStream(is));
+            this.ois = new MyObjectInputStream(new BufferedInputStream(is));
         }
 
         public void setUserList(DefaultListModel userList) {
