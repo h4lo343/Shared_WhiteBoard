@@ -558,6 +558,14 @@ public class CreateWhiteBoard {
                                             }
 
                                         }
+                                        if (type.equals("delete")) {
+                                            for (int i=0;i<ModelUserList.getSize();i++) {
+                                                if (ModelUserList.get(i).equals(updateMessage.userName)){
+                                                    ModelUserList.remove(i);
+                                                }
+                                            }
+                                        }
+
                                     break;
 
                             }

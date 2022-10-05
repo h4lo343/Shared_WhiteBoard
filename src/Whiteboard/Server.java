@@ -174,20 +174,21 @@ public class Server {
                     sockets.set(socketNum, null);
                     ObjectOutputs.set(socketNum, null);
                     ObjectInputs.set(socketNum, null);
-                    userID.set(socketNum, null);
 
-                    // once a client leave, we have to send all other clients the updated userlist
-//                   try {
-//                       for (int i = 0; i<sockets.size(); i++) {
-//                           if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
-//                               ObjectOutputStream oos = ObjectOutputs.get(i);
-//                               oos.writeObject(new UserListUpdate("updateUserList", "server", userID));
-//                               oos.flush();
-//                           }
-//                       }
-//                   } catch (Exception e2) {
-//                       e2.printStackTrace();
-//                   }
+                    //once a client leave, we have to send all other clients the updated userlist
+                   try {
+                       for (int i = 0; i<sockets.size(); i++) {
+                           System.out.println("send delete of: "+userID.get(socketNum) );
+                           if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
+                               ObjectOutputStream oos = ObjectOutputs.get(i);
+                               oos.writeObject(new UserListUpdate("updateUserList", "server", userID.get(socketNum),"delete"));
+                               oos.flush();
+                           }
+                       }
+                   } catch (Exception e2) {
+                       e2.printStackTrace();
+                   }
+                    userID.set(socketNum, null);
                     e.printStackTrace();
                     break;
                 }
