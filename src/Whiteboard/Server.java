@@ -142,7 +142,7 @@ public class Server {
                         ObjectOutputStream oos = ObjectOutputs.get(kickedIndex);
                         oos.writeObject(new Message("kick","server"));
                         oos.flush();
-                        
+
                     }
 
                     // if the message is a joinReply from manager

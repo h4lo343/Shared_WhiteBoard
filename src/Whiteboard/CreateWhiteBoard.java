@@ -547,6 +547,7 @@ public class CreateWhiteBoard {
 
                                     case "updateUserList":
                                         UserListUpdate updateMessage = (UserListUpdate)m;
+                                        System.out.println(updateMessage.type+ "||||||"+updateMessage.userName);
                                         String type = updateMessage.type;
                                         if (type.equals("add")) {
                                             boolean flag = true;
