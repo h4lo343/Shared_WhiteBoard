@@ -545,6 +545,13 @@ public class CreateWhiteBoard {
                                         UserListUpdate updateMessage = (UserListUpdate)m;
                                         String type = updateMessage.type;
                                         if (type.equals("add")) {
+                                            // first check whether the list contains username
+                                            // if yes, do not add again
+                                            for (int i=0;i<ModelUserList.getSize();i++) {
+                                                if (ModelUserList.get(i).equals(updateMessage.userName)){
+                                                    break;
+                                                }
+                                            }
                                             ModelUserList.addElement(updateMessage.userName);
                                         }
                                     break;
