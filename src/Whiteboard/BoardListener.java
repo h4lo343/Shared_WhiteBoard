@@ -23,7 +23,7 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
     Color currentColor;
     String text;
     OutputStream os;
-    MyObjectOutPutStream oos;
+    ObjectOutputStream oos;
     String senderID;
     boolean approved = false;
 
@@ -59,7 +59,7 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
 
     public void setOutPutStream(OutputStream os) throws IOException {
         this.os = os;
-        this.oos = new MyObjectOutPutStream(os);
+        this.oos = new ObjectOutputStream(os);
     }
 
     @Override

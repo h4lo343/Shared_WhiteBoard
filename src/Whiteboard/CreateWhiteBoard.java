@@ -441,14 +441,14 @@ public class CreateWhiteBoard {
     // the class for board to receive message from server
     public class Receive extends Thread {
 
-        MyObjectInputStream ois;
+        ObjectInputStream ois;
         BoardListener listener;
         DefaultListModel ModelUserList;
 
         public Receive(InputStream is, BoardListener listener) throws IOException {
             this.listener = listener;
 
-            this.ois = new MyObjectInputStream(new BufferedInputStream(is));
+            this.ois = new ObjectInputStream(new BufferedInputStream(is));
         }
 
         public void setUserList(DefaultListModel userList) {

@@ -115,7 +115,7 @@ public class Server {
                         // and send all clients the latest id list
                         for (int i = 0; i<sockets.size(); i++) {
                             if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
-                                MyObjectOutPutStream oos = (MyObjectOutPutStream) ObjectOutputs.get(i);
+                                ObjectOutputStream oos = ObjectOutputs.get(i);
                                 for (int j =0;j<userID.size();j++) {
                                     if(userID.get(j)!=null) {
                                         oos.writeObject(new UserListUpdate("updateUserList", "server", userID.get(j), "add"));
@@ -139,7 +139,7 @@ public class Server {
                                 kickedIndex=i;
                             }
                         }
-                        MyObjectOutPutStream oos = (MyObjectOutPutStream) ObjectOutputs.get(kickedIndex);
+                        ObjectOutputStream oos = ObjectOutputs.get(kickedIndex);
                         oos.writeObject(new Message("kick","server"));
                         oos.flush();
 
@@ -183,7 +183,7 @@ public class Server {
                         // been incremented yet
                         if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
 
-                            MyObjectOutPutStream oos = (MyObjectOutPutStream) ObjectOutputs.get(i);
+                            ObjectOutputStream oos =   ObjectOutputs.get(i);
                             oos.writeObject(m);
                             oos.flush();
                         }
@@ -205,7 +205,7 @@ public class Server {
                        for (int i = 0; i<sockets.size(); i++) {
                            System.out.println("send delete of: "+userID.get(socketNum) );
                            if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
-                               MyObjectOutPutStream oos = (MyObjectOutPutStream) ObjectOutputs.get(i);
+                               ObjectOutputStream oos =  ObjectOutputs.get(i);
                                oos.writeObject(new UserListUpdate("updateUserList", "server", userID.get(socketNum),"delete"));
                                oos.flush();
                            }
@@ -224,7 +224,7 @@ public class Server {
     // if a client joined, send it all the shapes stored in shapelist to init
     // the canvas of that client
     public void Init(int socketNum) throws IOException {
-        MyObjectOutPutStream os = (MyObjectOutPutStream) ObjectOutputs.get(socketNum);
+        ObjectOutputStream os =  ObjectOutputs.get(socketNum);
         for (int i = 0; i<shapes.size();i++) {
 
             os.writeObject(shapes.get(i));
