@@ -174,12 +174,13 @@ public class Server {
 
                     // receive the chat message and send it to every clients
                     if (m.message.equals("chat")) {
+                        ChatMessage chat = new ChatMessage("chat", m.senderID,  ((ChatMessage)m).chatContent);
                         for (int i = 0; i<sockets.size(); i++) {
                             if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
                                 ObjectOutputStream oos = ObjectOutputs.get(i);
-                                oos.writeObject(m);
+                                oos.writeObject(chat);
                                 oos.flush();
-                                System.out.println("send: "+ ((ChatMessage)m).chatContent+" to: "+sockets.get(i).getInetAddress());
+                                System.out.println("send: "+ chat.chatContent+" to: "+sockets.get(i).getInetAddress());
                             }
                         }
                     }
