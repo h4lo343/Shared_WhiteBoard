@@ -103,7 +103,7 @@ public class Server {
                                 // load new client with current stored shapes
                                 try {
                                     Init(sockets.size()-1);
-                                } catch (IOException e) {
+                                } catch (IOException | InterruptedException e) {
                                     e.printStackTrace();
                                 }
                             }
@@ -223,7 +223,8 @@ public class Server {
 
     // if a client joined, send it all the shapes stored in shapelist to init
     // the canvas of that client
-    public void Init(int socketNum) throws IOException {
+    public void Init(int socketNum) throws IOException, InterruptedException {
+        Thread.sleep(2000);
         ObjectOutputStream os =  ObjectOutputs.get(socketNum);
         for (int i = 0; i<shapes.size();i++) {
 
