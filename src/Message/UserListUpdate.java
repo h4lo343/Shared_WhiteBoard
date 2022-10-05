@@ -9,9 +9,12 @@ import java.util.LinkedList;
  * @date 2022/10/4 20:45
  */
 public class UserListUpdate extends Message implements Serializable {
-    public LinkedList<String> userList;
-    public UserListUpdate(String message, String senderID, LinkedList<String> userList) {
+    public String userName;
+    public String type;
+    public UserListUpdate(String message, String senderID, String userName, String type) {
         super(message, senderID);
-        this.userList = userList;
+        this.userName = userName;
+        this.type = type;
+
     }
 }

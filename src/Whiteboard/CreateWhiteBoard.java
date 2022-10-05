@@ -40,7 +40,7 @@ public class CreateWhiteBoard {
 
 
     public void start() throws IOException {
-
+        //"100.93.54.162"
         Socket s = new Socket( InetAddress.getLocalHost(), 8888);
 
         this.s = s;
@@ -455,17 +455,6 @@ public class CreateWhiteBoard {
                 try {
                     Object o = this.ois.readObject();
 
-                    if (o instanceof  LinkedList) {
-                        LinkedList userlist = (LinkedList) o;
-                        // clean the old userlist and update the new list
-                        System.out.println("----"+userlist.size());
-                        this.ModelUserList.clear();
-                        for (int i = 0; i<userlist.size(); i++){
-                            System.out.println(userlist.get(i));
-                            this.ModelUserList.addElement(userlist.get(i));
-                        }
-                    }
-
                     if (o instanceof Message) {
                         Message m = (Message) o;
                         // if the message is a shape, then it must be the shaped drawn by other peer
@@ -552,13 +541,12 @@ public class CreateWhiteBoard {
                                     }
 
 
-                                case "updateUserList":
-                                    // clean the old userlist and update the new list
-                                    this.ModelUserList.clear();
-                                    for (int i = 0; i<((UserListUpdate) m).userList.size(); i++){
-                                        System.out.println(((UserListUpdate) m).userList.get(i));
-                                        this.ModelUserList.addElement(((UserListUpdate) m).userList.get(i));
-                                    }
+                                    case "updateUserList":
+                                        UserListUpdate updateMessage = (UserListUpdate)m;
+                                        String type = updateMessage.type;
+                                        if (type.equals("add")) {
+                                            ModelUserList.addElement(updateMessage.userName);
+                                        }
                                     break;
 
                             }

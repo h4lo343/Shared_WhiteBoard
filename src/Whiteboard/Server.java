@@ -20,7 +20,7 @@ public class Server {
     ArrayList<ObjectOutputStream> ObjectOutputs = new ArrayList<ObjectOutputStream>();
     ArrayList<ObjectInputStream> ObjectInputs = new ArrayList<ObjectInputStream>();
     LinkedList<String> userID = new LinkedList<String>();
-    int iii=1;
+
 
     int managerIndex;
 
@@ -111,20 +111,17 @@ public class Server {
 
                         init.start();
 
-                        // after receive a hello from a client, update the userID list
+                        // after receive a hello from a client, update the userID
                         // and send all clients the latest id list
                         for (int i = 0; i<sockets.size(); i++) {
                             if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
-                                System.out.println("send: "+ sockets.get(i).getInetAddress()+" :"+userID.size());
-                                for (int j =0;j<userID.size();j++) {
-                                    System.out.println(userID.get(j));
-                                }
+                                System.out.println("send new user id: "+m.senderID);
                                 ObjectOutputStream oos = ObjectOutputs.get(i);
-                                oos.writeObject(userID);
+                                oos.writeObject(new UserListUpdate("updateUserList", "server", m.senderID, "add"));
                                 oos.flush();
                             }
                         }
-                        iii+=1;
+
                     }
                     // if the message is a joinReply from manager
                     // server has to tell the client whether is has been invited
