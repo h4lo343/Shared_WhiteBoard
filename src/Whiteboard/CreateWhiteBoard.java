@@ -377,19 +377,21 @@ public class CreateWhiteBoard {
         List.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                if (l.authorized == false) {
-                    JOptionPane.showMessageDialog(null, "only manager can do this");
-                }
-                if (List.getSelectedValue().equals(l.senderID)) {
-                    JOptionPane.showMessageDialog(null, "You can not kick yourself");
-                }
-                else {
-                    int input = JOptionPane.showConfirmDialog(null, "Do you really want to kick user: "+ List.getSelectedValue(),"Kick", JOptionPane.YES_NO_OPTION);
-                    if (input == 0) {
-                        try {
-                            l.sendKick((String) List.getSelectedValue());
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
+                if (List.getSelectedValue()!=null) {
+                    if (l.authorized == false) {
+                        JOptionPane.showMessageDialog(null, "only manager can do this");
+                    }
+                    if (List.getSelectedValue().equals(l.senderID)) {
+                        JOptionPane.showMessageDialog(null, "You can not kick yourself");
+                    }
+                    else {
+                        int input = JOptionPane.showConfirmDialog(null, "Do you really want to kick user: "+ List.getSelectedValue(),"Kick", JOptionPane.YES_NO_OPTION);
+                        if (input == 0) {
+                            try {
+                                l.sendKick((String) List.getSelectedValue());
+                            } catch (IOException ex) {
+                                ex.printStackTrace();
+                            }
                         }
                     }
                 }
