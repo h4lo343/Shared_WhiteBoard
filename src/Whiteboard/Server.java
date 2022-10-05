@@ -52,7 +52,7 @@ public class Server {
             // if the user is the first in the server, give
             // the user the manager authority
             if (sockets.size()==1) {
-                ObjectOutputStream oos = ObjectOutputs.get(sockets.size()-1);
+                MyObjectOutPutStream oos = ObjectOutputs.get(sockets.size()-1);
                 oos.writeObject(new Message("authorization", "server"));
                 // record the position of manager socket in list
                 managerIndex = sockets.size()-1;
@@ -60,7 +60,7 @@ public class Server {
             }
             // if it is the normal client, ask manager whether to let the client join
             else {
-                ObjectOutputStream oos = ObjectOutputs.get(managerIndex);
+                MyObjectOutPutStream oos = ObjectOutputs.get(managerIndex);
                 oos.writeObject(new JoinRequest("request", "server", client.getInetAddress().toString(),sockets.size()-1 ));
             }
 
@@ -75,8 +75,8 @@ public class Server {
     // the monitor class which monitor the coming message from clients
     class Monitor extends Thread {
         int socketNum;
-        ObjectInputStream oi;
-        ObjectOutputStream os;
+        MyObjectInputStream oi;
+        MyObjectOutPutStream os;
         public Monitor(int socketNum) {
             this.socketNum = socketNum;
             Socket s = sockets.get(socketNum);
@@ -115,7 +115,7 @@ public class Server {
                         // and send all clients the latest id list
                         for (int i = 0; i<sockets.size(); i++) {
                             if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
-                                ObjectOutputStream oos = ObjectOutputs.get(i);
+                                MyObjectOutPutStream oos = ObjectOutputs.get(i);
                                 for (int j =0;j<userID.size();j++) {
                                     if(userID.get(j)!=null) {
                                         oos.writeObject(new UserListUpdate("updateUserList", "server", userID.get(j), "add"));
@@ -139,7 +139,7 @@ public class Server {
                                 kickedIndex=i;
                             }
                         }
-                        ObjectOutputStream oos = ObjectOutputs.get(kickedIndex);
+                        MyObjectOutPutStream oos = ObjectOutputs.get(kickedIndex);
                         oos.writeObject(new Message("kick","server"));
                         oos.flush();
 
@@ -149,7 +149,7 @@ public class Server {
                     // server has to tell the client whether is has been invited
                     if (m.message.equals("reply")) {
                         JoinReply reply = (JoinReply)m;
-                        ObjectOutputStream oos = ObjectOutputs.get(reply.socketNum);
+                        MyObjectOutPutStream oos = ObjectOutputs.get(reply.socketNum);
                         if (reply.agree) {
                             oos.writeObject(new JoinResponse("response", "server", true ));
                             oos.flush();
@@ -183,7 +183,7 @@ public class Server {
                         // been incremented yet
                         if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
 
-                            ObjectOutputStream oos = ObjectOutputs.get(i);
+                            MyObjectOutPutStream oos = ObjectOutputs.get(i);
                             oos.writeObject(m);
                             oos.flush();
                         }
@@ -204,7 +204,7 @@ public class Server {
                        for (int i = 0; i<sockets.size(); i++) {
                            System.out.println("send delete of: "+userID.get(socketNum) );
                            if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
-                               ObjectOutputStream oos = ObjectOutputs.get(i);
+                               MyObjectOutPutStream oos = ObjectOutputs.get(i);
                                oos.writeObject(new UserListUpdate("updateUserList", "server", userID.get(socketNum),"delete"));
                                oos.flush();
                            }
@@ -223,7 +223,7 @@ public class Server {
     // if a client joined, send it all the shapes stored in shapelist to init
     // the canvas of that client
     public void Init(int socketNum) throws IOException {
-        ObjectOutputStream os = ObjectOutputs.get(socketNum);
+        MyObjectOutPutStream os = ObjectOutputs.get(socketNum);
         for (int i = 0; i<shapes.size();i++) {
 
             os.writeObject(shapes.get(i));

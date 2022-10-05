@@ -42,7 +42,7 @@ public class CreateWhiteBoard {
     public void start() throws IOException {
         //"100.93.54.162"
         //"10.13.102.149"
-        Socket s = new Socket( InetAddress.getLocalHost(), 8888);
+        Socket s = new Socket( "10.13.102.149", 8888);
 
         this.s = s;
         this.is = s.getInputStream();
