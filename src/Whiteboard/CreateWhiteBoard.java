@@ -460,10 +460,9 @@ public class CreateWhiteBoard {
             System.out.println("receiver started");
             while (true) {
                 try {
-                    Object o = this.ois.readObject();
+                    Message m = (Message) this.ois.readObject();
 
-                    if (o instanceof Message) {
-                        Message m = (Message) o;
+                    if (m instanceof Message) {
                         // if the message is a shape, then it must be the shaped drawn by other peer
                         // draw these shapes on its own canvas using different drawing methods
                         if (m instanceof Shapes) {
