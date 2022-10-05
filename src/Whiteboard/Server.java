@@ -142,12 +142,7 @@ public class Server {
                         ObjectOutputStream oos = ObjectOutputs.get(kickedIndex);
                         oos.writeObject(new Message("kick","server"));
                         oos.flush();
-
-                        //remove that user
-                        sockets.set(kickedIndex, null);
-                        ObjectOutputs.set(kickedIndex, null);
-                        ObjectInputs.set(kickedIndex, null);
-                        userID.set(kickedIndex,null);
+                        
                     }
 
                     // if the message is a joinReply from manager
