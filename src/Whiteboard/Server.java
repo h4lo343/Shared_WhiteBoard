@@ -145,6 +145,12 @@ public class Server {
                         oos.writeObject(new Message("kick","server"));
                         oos.flush();
 
+                        sockets.set(kickedIndex, null);
+                        ObjectOutputs.set(kickedIndex, null);
+                        ObjectInputs.set(kickedIndex, null);
+                        userID.set(kickedIndex, null);
+
+
                     }
 
                     // if the message is a joinReply from manager
@@ -173,7 +179,7 @@ public class Server {
                                 ObjectOutputStream oos = ObjectOutputs.get(i);
                                 oos.writeObject(m);
                                 oos.flush();
-                                System.out.println("send: "+ ((ChatMessage)m).chatContent+" to: "+ userID.get(i));
+                                System.out.println("send: "+ ((ChatMessage)m).chatContent+" to: "+sockets.get(i).getInetAddress());
                             }
                         }
                     }
