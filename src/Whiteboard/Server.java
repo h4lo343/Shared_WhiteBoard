@@ -157,6 +157,9 @@ public class Server {
                         else {
                             oos.writeObject(new JoinResponse("response", "server", false ));
                             oos.flush();
+                            sockets.set(reply.socketNum, null);
+                            ObjectOutputs.set(reply.socketNum, null);
+                            ObjectInputs.set(reply.socketNum, null);
                         }
 
                     }
@@ -189,7 +192,9 @@ public class Server {
 
                 } catch (IOException | ClassNotFoundException e)  {
                     // if one client exited, set its socket position and I/O position in lists as null
-                    System.out.println("client left: "+userID.get(socketNum));
+                    if (socketNum<=sockets.size()-1) {
+                        System.out.println("client left: "+userID.get(socketNum));
+                    }
                     sockets.set(socketNum, null);
                     ObjectOutputs.set(socketNum, null);
                     ObjectInputs.set(socketNum, null);
