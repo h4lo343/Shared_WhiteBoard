@@ -221,6 +221,17 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
         }
     }
 
+    // used by client to send chat message
+    public void sendChat(String chatContent) {
+        try {
+            ChatMessage c = new ChatMessage("chat", this.senderID, chatContent);
+            oos.writeObject(c);
+            oos.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     // draw straight line method
     public void drawStraightLine(int x2, int y2, int x, int y, Color color) {
         graph.setColor(color);

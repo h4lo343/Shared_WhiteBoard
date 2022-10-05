@@ -126,6 +126,18 @@ public class Server {
                         }
 
                     }
+
+                    // receive the chat message and send it to every clients
+                    if (m.message.equals("chat")) {
+                        for (int i = 0; i<sockets.size(); i++) {
+                            if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
+                                ObjectOutputStream oos = ObjectOutputs.get(i);
+                                oos.writeObject(m);
+                                oos.flush();
+                            }
+                        }
+                    }
+
                     // response to kick request from manager, remove that user
                     // let send him an inform
                     if (m.message.equals("kick")) {

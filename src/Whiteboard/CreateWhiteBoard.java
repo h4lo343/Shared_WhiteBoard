@@ -42,7 +42,7 @@ public class CreateWhiteBoard {
     public void start() throws IOException {
         //"100.93.54.162"
         //"10.13.102.149"
-        Socket s = new Socket( "10.13.102.149", 8888);
+        Socket s = new Socket( InetAddress.getLocalHost(), 8888);
 
         this.s = s;
         this.is = s.getInputStream();
@@ -338,16 +338,15 @@ public class CreateWhiteBoard {
         chatWindow.setPreferredSize(new Dimension(200, 1000));
         board.add(chatWindow, BorderLayout.WEST);
 
+
         // draw the message window
-        JLabel message = new JLabel("Message: ");
-        chatWindow.add(message);
-        JTextArea messageWindow = new JTextArea();
-        messageWindow.setPreferredSize(new Dimension(200, 400));
-        messageWindow.setWrapStyleWord(true);
-        messageWindow.setLineWrap(true);
-        messageWindow.setEditable(false);
-        messageWindow.append("Message would be shown here:");
-        chatWindow.add(messageWindow);
+        DefaultListModel chatModel = new DefaultListModel();
+        JList messageWindow = new JList(chatModel);
+
+        JScrollPane scroll = new JScrollPane(messageWindow,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scroll.setPreferredSize(new Dimension(200, 400));
+        chatWindow.add(scroll);
+        receiver.setMessageWindow(chatModel);
 
         // draw the input window
         JButton send = new JButton("send");
@@ -355,6 +354,17 @@ public class CreateWhiteBoard {
         send.setSize(1, 1);
         chatWindow.add(send);
         JTextArea inputWindow = new JTextArea();
+        // chat message sending method
+        send.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // prevent sending empty string
+                if (inputWindow.getText().length()!=0) {
+                    l.sendChat(inputWindow.getText());
+                    inputWindow.setText(null);
+                }
+            }
+        });
         inputWindow.setBounds(30, 100, 100, 100);
         inputWindow.setPreferredSize(new Dimension(200, 300));
         chatWindow.add(inputWindow);
@@ -444,6 +454,7 @@ public class CreateWhiteBoard {
         ObjectInputStream ois;
         BoardListener listener;
         DefaultListModel ModelUserList;
+        DefaultListModel MessageWindow;
 
         public Receive(InputStream is, BoardListener listener) throws IOException {
             this.listener = listener;
@@ -454,6 +465,8 @@ public class CreateWhiteBoard {
         public void setUserList(DefaultListModel userList) {
             this.ModelUserList = userList;
         }
+
+        public void setMessageWindow(DefaultListModel messageWindow) {this.MessageWindow = messageWindow;}
 
         @Override
         public void run() {
@@ -548,7 +561,6 @@ public class CreateWhiteBoard {
 
                                     case "updateUserList":
                                         UserListUpdate updateMessage = (UserListUpdate)m;
-                                        System.out.println(updateMessage.type+ "||||||"+updateMessage.userName);
                                         String type = updateMessage.type;
                                         if (type.equals("add")) {
                                             boolean flag = true;
@@ -576,6 +588,15 @@ public class CreateWhiteBoard {
                                     case "kick":
                                         JOptionPane.showMessageDialog(null, "you are kicked by manager");
                                         System.exit(0);
+                                        break;
+
+                                    case "chat":
+                                        ChatMessage chat = (ChatMessage)m;
+                                        String id = chat.senderID;
+                                        String content = chat.chatContent;
+                                        MessageWindow.addElement(id+": "+content);
+                                        break;
+
 
                             }
                         }
