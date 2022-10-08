@@ -35,18 +35,20 @@ public class CreateWhiteBoard {
 
     public static void main(String[] args) throws IOException {
 
-        CreateWhiteBoard wb = new CreateWhiteBoard();
-        wb.start();
+        // get ip and port strings from arguments
+        String ip = args[0];
+        int port = Integer.parseInt(args[1]);
 
+        CreateWhiteBoard wb = new CreateWhiteBoard();
+        wb.start(ip, port);
     }
 
-
-    public void start() throws IOException {
+    public void start(String ip, int port) throws IOException {
         //"100.93.54.162"
         //"10.13.102.149"
         //"10.13.127.172"
 
-        Socket s = new Socket( "10.13.127.172", 8888);
+        Socket s = new Socket(ip, port);
 
         this.s = s;
         this.is = s.getInputStream();
@@ -645,13 +647,8 @@ public class CreateWhiteBoard {
                                         JOptionPane.showMessageDialog(null, "manager left, turn off the application");
                                         System.exit(0);
                                         break;
-
-
-
-
                             }
                         }
-
                     }
 
 
@@ -662,7 +659,6 @@ public class CreateWhiteBoard {
                     e.printStackTrace();
                 }
             }
-
         }
     }
 }
