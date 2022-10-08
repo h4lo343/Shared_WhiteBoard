@@ -220,31 +220,33 @@ public class Server {
                     }
 
                 } catch (IOException | ClassNotFoundException e)  {
-                    // if one client exited, set its socket position and I/O position in lists as null
-                    if (socketNum<=sockets.size()-1) {
+                    if (socketNum<= sockets.size()-1) {
+                        // if one client exited, set its socket position and I/O position in lists as null
+                        if (socketNum<=sockets.size()-1) {
+                            System.out.println("client left: "+userID.get(socketNum));
+                        }
                         System.out.println("client left: "+userID.get(socketNum));
-                    }
-                    System.out.println("client left: "+userID.get(socketNum));
-                    sockets.set(socketNum, null);
-                    ObjectOutputs.set(socketNum, null);
-                    ObjectInputs.set(socketNum, null);
+                        sockets.set(socketNum, null);
+                        ObjectOutputs.set(socketNum, null);
+                        ObjectInputs.set(socketNum, null);
 
-                    //once a client leave, we have to send all other clients the updated userlist
-                   try {
-                       for (int i = 0; i<sockets.size(); i++) {
-                           System.out.println("send delete of: "+userID.get(socketNum) );
-                           if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
-                               ObjectOutputStream oos =  ObjectOutputs.get(i);
-                               oos.writeObject(new UserListUpdate("updateUserList", "server", userID.get(socketNum),"delete"));
-                               oos.flush();
-                           }
-                       }
-                   } catch (Exception e2) {
-                       e2.printStackTrace();
-                   }
-                    userID.set(socketNum, null);
-                    e.printStackTrace();
-                    break;
+                        //once a client leave, we have to send all other clients the updated userlist
+                        try {
+                            for (int i = 0; i<sockets.size(); i++) {
+                                System.out.println("send delete of: "+userID.get(socketNum) );
+                                if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
+                                    ObjectOutputStream oos =  ObjectOutputs.get(i);
+                                    oos.writeObject(new UserListUpdate("updateUserList", "server", userID.get(socketNum),"delete"));
+                                    oos.flush();
+                                }
+                            }
+                        } catch (Exception e2) {
+                            e2.printStackTrace();
+                        }
+                        userID.set(socketNum, null);
+                        e.printStackTrace();
+                        break;
+                    }
                 }
             }
         }
