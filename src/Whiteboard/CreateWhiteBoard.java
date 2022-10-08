@@ -42,8 +42,9 @@ public class CreateWhiteBoard {
     public void start() throws IOException {
         //"100.93.54.162"
         //"10.13.102.149"
+        //"10.13.127.172"
 
-        Socket s = new Socket( "10.13.127.172", 8888);
+        Socket s = new Socket( InetAddress.getLocalHost(), 8888);
 
         this.s = s;
         this.is = s.getInputStream();
@@ -289,6 +290,49 @@ public class CreateWhiteBoard {
         textInput.setPreferredSize(new Dimension(170, 27));
         functionBar.add(textInput);
 
+        // once click the text button
+        // the content in text area would be passed
+        // to listener and penType would be set as "Text"
+        JButton textButton = new JButton("Text");
+        textButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String content = textInput.getText();
+                l.setPenType("Text");
+                l.setText(content);
+            }
+        });
+        functionBar.add(textButton);
+
+
+
+        /*
+         * Draw the Color Bar
+         */
+
+        JPanel colorBar = new JPanel();
+        JLabel colorLabel = new JLabel("Choose Color:");
+        colorBar.add(colorLabel);
+        colorBar.setBackground(Color.gray);
+        board.add(colorBar, BorderLayout.SOUTH);
+
+        // Add color button
+        Color[] colors = {Color.BLACK, Color.gray, Color.pink, Color.red, Color.CYAN, Color.green, Color.BLUE,
+                Color.yellow, Color.DARK_GRAY, Color.ORANGE, new Color(46, 64, 83), Color.magenta, Color.LIGHT_GRAY, new Color(108, 52, 131), new Color(203, 67, 53)
+                , new Color(120, 66, 18), new Color(52, 152, 219), new Color(131, 145, 146)
+
+        };
+
+        for (int i = 0; i <= colors.length - 1; i++) {
+
+            JButton button = new JButton();
+            button.setBackground(colors[i]);
+            button.setPreferredSize(new Dimension(40, 40));
+
+            button.addActionListener(l);
+            colorBar.add(button);
+        }
+
         /*
          * Draw the userList
          */
@@ -327,47 +371,6 @@ public class CreateWhiteBoard {
         });
         List.setPreferredSize(new Dimension(200, 400));
         userList.add(List);
-
-        // once click the text button
-        // the content in text area would be passed
-        // to listener and penType would be set as "Text"
-        JButton textButton = new JButton("Text");
-        textButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String content = textInput.getText();
-                l.setPenType("Text");
-                l.setText(content);
-            }
-        });
-        functionBar.add(textButton);
-
-        /*
-         * Draw the Color Bar
-         */
-
-        JPanel colorBar = new JPanel();
-        JLabel colorLabel = new JLabel("Choose Color:");
-        colorBar.add(colorLabel);
-        colorBar.setBackground(Color.gray);
-        board.add(colorBar, BorderLayout.SOUTH);
-
-        // Add color button
-        Color[] colors = {Color.BLACK, Color.gray, Color.pink, Color.red, Color.CYAN, Color.green, Color.BLUE,
-                Color.yellow, Color.DARK_GRAY, Color.ORANGE, new Color(46, 64, 83), Color.magenta, Color.LIGHT_GRAY, new Color(108, 52, 131), new Color(203, 67, 53)
-                , new Color(120, 66, 18), new Color(52, 152, 219), new Color(131, 145, 146)
-
-        };
-
-        for (int i = 0; i <= colors.length - 1; i++) {
-
-            JButton button = new JButton();
-            button.setBackground(colors[i]);
-            button.setPreferredSize(new Dimension(40, 40));
-
-            button.addActionListener(l);
-            colorBar.add(button);
-        }
 
 
         /*
