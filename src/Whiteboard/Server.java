@@ -94,6 +94,7 @@ public class Server {
                         System.out.println("received a client: " + m.senderID);
 
 
+                        boolean duplicate = false;
                         // check whether the username already exist
                         for (int i=0;i<=userID.size()-1;i++) {
                             if (userID.get(i) != null) {
@@ -103,9 +104,18 @@ public class Server {
                                     oos.flush();
                                     System.out.println("send duplicate delete");
                                     userID.add(null);
+                                    ObjectOutputs.set(socketNum, null);
+                                    sockets.set(socketNum, null);
+                                    ObjectInputs.set(socketNum, null);
+                                    duplicate = true;
                                     break;
                                 }
                             }
+                        }
+
+                        // if it is a duplicate username, just end the monitor thread
+                        if (duplicate == true) {
+                            break;
                         }
 
                         userID.add(m.senderID);
