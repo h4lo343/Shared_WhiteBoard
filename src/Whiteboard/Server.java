@@ -220,7 +220,7 @@ public class Server {
                     }
 
                 } catch (IOException | ClassNotFoundException e)  {
-                    if (socketNum<= sockets.size()-1) {Thread.interrupted();}
+                    if (socketNum> userID.size()-1) {Thread.interrupted();}
                         // if one client exited, set its socket position and I/O position in lists as null
                         if (socketNum<=sockets.size()-1) {
                             System.out.println("client left: "+userID.get(socketNum));
