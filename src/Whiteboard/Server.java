@@ -103,6 +103,7 @@ public class Server {
                                     oos.flush();
                                     System.out.println("send duplicate delete");
                                     userID.add(null);
+                                    break;
                                 }
                             }
                         }
