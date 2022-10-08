@@ -234,7 +234,7 @@ public class Server {
                         // if manager left, shut down server and inform every client to close the application
                         if (socketNum == 0) {
                             try {
-                                for (int i = 0; i<sockets.size(); i++) {
+                                for (int i = 1; i<sockets.size(); i++) {
                                     if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
                                         ObjectOutputStream oos =  ObjectOutputs.get(i);
                                         oos.writeObject(new ManagerLeave("leave", "server"));
