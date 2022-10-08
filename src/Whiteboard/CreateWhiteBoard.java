@@ -646,7 +646,7 @@ public class CreateWhiteBoard {
                                         System.exit(0);
                                         break;
 
-                                case "duplicate":
+                                    case "duplicate":
                                         JOptionPane.showMessageDialog(null, "username: "+ m.senderID+" already exists, use a different name to try again");
                                         System.exit(0);
                                         break;
