@@ -95,14 +95,13 @@ public class Server {
 
 
                         // check whether the username already exist
-                        for (int i=0;i<userID.size()-1;i++) {
+                        for (int i=0;i<=userID.size()-1;i++) {
                             if (userID.get(i).equals(m.senderID)) {
                                 ObjectOutputStream oos = ObjectOutputs.get(socketNum);
                                 oos.writeObject(new Message("duplicate", m.senderID));
                                 oos.flush();
                                 System.out.println("send duplicate delete");
                                 userID.add(null);
-                                Thread.sleep(1000);
                             }
                         }
 
@@ -232,7 +231,7 @@ public class Server {
 
                     }
 
-                } catch (IOException | ClassNotFoundException | InterruptedException e)  {
+                } catch (IOException | ClassNotFoundException e)  {
 
                     // this if is for user who are rejected by manager at first
                     // for those clients, their user name has not been added to userID list,
