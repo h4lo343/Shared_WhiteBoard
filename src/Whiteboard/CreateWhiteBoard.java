@@ -44,7 +44,7 @@ public class CreateWhiteBoard {
         //"10.13.102.149"
         //"10.13.127.172"
 
-        Socket s = new Socket( InetAddress.getLocalHost(), 8888);
+        Socket s = new Socket( "10.13.127.172", 8888);
 
         this.s = s;
         this.is = s.getInputStream();
