@@ -101,7 +101,7 @@ public class Server {
                                 oos.writeObject(new Message("duplicate", m.senderID));
                                 oos.flush();
                                 userID.add(null);
-                                break;
+                                Thread.sleep(1000);
                             }
                         }
 
@@ -231,7 +231,7 @@ public class Server {
 
                     }
 
-                } catch (IOException | ClassNotFoundException e)  {
+                } catch (IOException | ClassNotFoundException | InterruptedException e)  {
 
                     // this if is for user who are rejected by manager at first
                     // for those clients, their user name has not been added to userID list,
