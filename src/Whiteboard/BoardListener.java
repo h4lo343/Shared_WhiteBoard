@@ -224,7 +224,7 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
     // used by client to send chat message
     public void sendChat(String chatContent) {
         try {
-            ChatMessage c = new ChatMessage("chat", this.senderID, chatContent);
+            ChatRequest c = new ChatRequest("chat", this.senderID, chatContent);
             oos.writeObject(c);
             oos.flush();
         } catch (IOException e) {
