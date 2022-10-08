@@ -92,7 +92,7 @@ public class Server {
                     // get the sender's ID and store it in list
                     if (m.message.equals("Hello")) {
                         System.out.println("received a client: " + m.senderID);
-                        userID.add(m.senderID);
+
 
                         // check whether the username already exist
                         for (int i=0;i<userID.size()-1;i++) {
@@ -100,9 +100,12 @@ public class Server {
                                 ObjectOutputStream oos = ObjectOutputs.get(socketNum);
                                 oos.writeObject(new Message("duplicate", m.senderID));
                                 oos.flush();
+                                userID.add(null);
                                 break;
                             }
                         }
+
+                        userID.add(m.senderID);
 
                         // after receivd hello from client, start to init
                         // client's canvas with previous shapes
