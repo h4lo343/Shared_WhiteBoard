@@ -96,7 +96,7 @@ public class Server {
 
                         // check whether the username already exist
                         for (int i=0;i<userID.size()-1;i++) {
-                            if (userID.get(i).equals(m.senderID)&& i != socketNum) {
+                            if (userID.get(i).equals(m.senderID)) {
                                 ObjectOutputStream oos = ObjectOutputs.get(socketNum);
                                 oos.writeObject(new Message("duplicate", m.senderID));
                                 oos.flush();
