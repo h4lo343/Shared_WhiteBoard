@@ -45,8 +45,7 @@ public class CreateWhiteBoard {
     }
 
     public void start(String ip, int port, String username) throws IOException {
-        
-        this.username = username;
+
 
         //"100.93.54.162"
         //"10.13.102.149"
@@ -106,7 +105,6 @@ public class CreateWhiteBoard {
             }
         });
         checker.start();
-
 
     }
 
@@ -645,6 +643,11 @@ public class CreateWhiteBoard {
 
                                     case "leave":
                                         JOptionPane.showMessageDialog(null, "manager left, turn off the application");
+                                        System.exit(0);
+                                        break;
+
+                                case "duplicate":
+                                        JOptionPane.showMessageDialog(null, "username: "+ m.senderID+" already exists, use a different name to try again");
                                         System.exit(0);
                                         break;
                             }
