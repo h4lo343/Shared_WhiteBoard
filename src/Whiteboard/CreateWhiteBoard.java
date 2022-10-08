@@ -42,7 +42,8 @@ public class CreateWhiteBoard {
     public void start() throws IOException {
         //"100.93.54.162"
         //"10.13.102.149"
-        Socket s = new Socket( "100.93.54.162", 8888);
+
+        Socket s = new Socket( "10.13.127.172", 8888);
 
         this.s = s;
         this.is = s.getInputStream();
@@ -588,17 +589,18 @@ public class CreateWhiteBoard {
                                         break;
 
                                     case "chat":
-                                        ChatMessage chat = (ChatMessage)m;
-                                        System.out.println(chat.chatContent+"-------");
-                                        String id = chat.senderID;
-                                        String content = chat.chatContent;
-                                        // set the if because sometimes the receiver starts before the
-                                        // initialization of the messageWindow which would cause a
-                                        // null pointer fault
-                                        if (MessageWindow !=null) {
-                                            MessageWindow.addElement(id+": "+content);
+                                        if(m instanceof ChatMessage) {
+                                            ChatMessage chat = (ChatMessage)m;
+                                            System.out.println(chat.chatContent+"-------");
+                                            String id = chat.senderID;
+                                            String content = chat.chatContent;
+                                            // set the if because sometimes the receiver starts before the
+                                            // initialization of the messageWindow which would cause a
+                                            // null pointer fault
+                                            if (MessageWindow !=null) {
+                                                MessageWindow.addElement(id+": "+content);
+                                            }
                                         }
-
                                         break;
 
 
