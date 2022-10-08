@@ -551,6 +551,7 @@ public class CreateWhiteBoard {
                                     }
                                     else {
                                         JOptionPane.showMessageDialog(null, "you are rejected by manager");
+                                        System.exit(0);
                                         break;
                                     }
 
