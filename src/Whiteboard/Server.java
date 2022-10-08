@@ -100,6 +100,7 @@ public class Server {
                                 ObjectOutputStream oos = ObjectOutputs.get(socketNum);
                                 oos.writeObject(new Message("duplicate", m.senderID));
                                 oos.flush();
+                                System.out.println("send duplicate delete");
                                 userID.add(null);
                                 Thread.sleep(1000);
                             }
