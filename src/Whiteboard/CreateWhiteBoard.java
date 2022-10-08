@@ -31,19 +31,23 @@ public class CreateWhiteBoard {
     InputStream is;
     OutputStream os;
     Receive receiver;
+    String username;
 
 
     public static void main(String[] args) throws IOException {
 
-        // get ip and port strings from arguments
+        // get ip, port and username strings from arguments
         String ip = args[0];
         int port = Integer.parseInt(args[1]);
-
+        String userName = args[2];
         CreateWhiteBoard wb = new CreateWhiteBoard();
-        wb.start(ip, port);
+        wb.start(ip, port, userName);
     }
 
-    public void start(String ip, int port) throws IOException {
+    public void start(String ip, int port, String username) throws IOException {
+        
+        this.username = username;
+
         //"100.93.54.162"
         //"10.13.102.149"
         //"10.13.127.172"
@@ -472,13 +476,9 @@ public class CreateWhiteBoard {
         l.setGraph(g);
 
 
-        // create a random username, assign it to listener
-        StringBuffer sb = new StringBuffer();
-        for (int i=0;i<=5;i++) {
-            sb.append(((char)(new Random().nextInt(26)+'A')));
-        }
-        String id = new String(sb);
-        l.setSenderID(id);
+
+
+        l.setSenderID(this.username);
         l.sendHello();
 
     }

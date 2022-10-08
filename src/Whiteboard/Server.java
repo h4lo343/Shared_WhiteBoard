@@ -140,7 +140,6 @@ public class Server {
                                 kickedIndex=i;
                             }
                         }
-                        System.out.println("======: "+kickedIndex);
                         ObjectOutputStream oos = ObjectOutputs.get(kickedIndex);
                         oos.writeObject(new Message("kick","server"));
                         oos.flush();
