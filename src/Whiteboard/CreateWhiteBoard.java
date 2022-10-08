@@ -46,6 +46,8 @@ public class CreateWhiteBoard {
 
     public void start(String ip, int port, String username) throws IOException {
 
+        this.username = username;
+
 
         //"100.93.54.162"
         //"10.13.102.149"
