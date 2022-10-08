@@ -289,6 +289,45 @@ public class CreateWhiteBoard {
         textInput.setPreferredSize(new Dimension(170, 27));
         functionBar.add(textInput);
 
+        /*
+         * Draw the userList
+         */
+        JPanel userList = new JPanel();
+        userList.setPreferredSize(new Dimension(200, 1000));
+        userList.setBackground(Color.lightGray);
+        board.add(userList, BorderLayout.EAST);
+        JLabel list = new JLabel("User List:");
+        userList.add(list);
+        DefaultListModel modelUserList = new DefaultListModel();
+        JList List = new JList(modelUserList);
+        this.receiver.setUserList(modelUserList);
+
+        List.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (List.getSelectedValue()!=null) {
+                    if (l.authorized == false) {
+                        JOptionPane.showMessageDialog(null, "only manager can do this");
+                    }
+                    if (List.getSelectedValue().equals(l.senderID)) {
+                        JOptionPane.showMessageDialog(null, "You can not kick yourself");
+                    }
+                    else {
+                        int input = JOptionPane.showConfirmDialog(null, "Do you really want to kick user: "+ List.getSelectedValue(),"Kick", JOptionPane.YES_NO_OPTION);
+                        if (input == 0) {
+                            try {
+                                l.sendKick((String) List.getSelectedValue());
+                            } catch (IOException ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        List.setPreferredSize(new Dimension(200, 400));
+        userList.add(List);
+
         // once click the text button
         // the content in text area would be passed
         // to listener and penType would be set as "Text"
@@ -372,53 +411,8 @@ public class CreateWhiteBoard {
         inputWindow.setLineWrap(true);
         inputWindow.setWrapStyleWord(true);
 
-        /*
-         * Draw the userList
-         */
-        JPanel userList = new JPanel();
-        userList.setPreferredSize(new Dimension(200, 1000));
-        userList.setBackground(Color.lightGray);
-        board.add(userList, BorderLayout.EAST);
-        JLabel list = new JLabel("User List:");
-        userList.add(list);
-        DefaultListModel modelUserList = new DefaultListModel();
-        JList List = new JList(modelUserList);
-        this.receiver.setUserList(modelUserList);
-
-        List.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (List.getSelectedValue()!=null) {
-                    if (l.authorized == false) {
-                        JOptionPane.showMessageDialog(null, "only manager can do this");
-                    }
-                    if (List.getSelectedValue().equals(l.senderID)) {
-                        JOptionPane.showMessageDialog(null, "You can not kick yourself");
-                    }
-                    else {
-                        int input = JOptionPane.showConfirmDialog(null, "Do you really want to kick user: "+ List.getSelectedValue(),"Kick", JOptionPane.YES_NO_OPTION);
-                        if (input == 0) {
-                            try {
-                                l.sendKick((String) List.getSelectedValue());
-                            } catch (IOException ex) {
-                                ex.printStackTrace();
-                            }
-                        }
-                    }
-                }
-            }
-        });
-        List.setPreferredSize(new Dimension(200, 400));
-        userList.add(List);
 
 
-
-//        JTextArea listArea = new JTextArea();
-//        listArea.setPreferredSize(new Dimension(200, 400));
-//        userList.add(listArea);
-//        listArea.setEditable(false);
-//        listArea.setWrapStyleWord(true);
-//        listArea.setLineWrap(true);
 
 
         // create graphics object for the canvas
