@@ -141,6 +141,7 @@ public class Server {
                                 kickedIndex=i;
                             }
                         }
+                        System.out.println("======: "+kickedIndex);
                         ObjectOutputStream oos = ObjectOutputs.get(kickedIndex);
                         oos.writeObject(new Message("kick","server"));
                         oos.flush();
@@ -220,7 +221,11 @@ public class Server {
                     }
 
                 } catch (IOException | ClassNotFoundException e)  {
-                    if (socketNum> userID.size()-1) {break;}
+                    if (socketNum> userID.size()-1) {
+                        sockets.set(socketNum, null);
+                        ObjectOutputs.set(socketNum, null);
+                        ObjectInputs.set(socketNum, null);
+                        break;}
                         // if one client exited, set its socket position and I/O position in lists as null
                         if (socketNum<=sockets.size()-1) {
                             System.out.println("client left: "+userID.get(socketNum));
