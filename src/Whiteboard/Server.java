@@ -145,20 +145,20 @@ public class Server {
                         oos.writeObject(new Message("kick","server"));
                         oos.flush();
 
-                        // once kick a user, update the user list information
-                        for (int i = 0; i<sockets.size(); i++) {
-                            System.out.println("send delete of: "+userID.get(kickedIndex) );
-                            if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
-                                ObjectOutputStream oos2 =  ObjectOutputs.get(i);
-                                oos.writeObject(new UserListUpdate("updateUserList", "server", userID.get(kickedIndex),"delete"));
-                                oos.flush();
-                            }
-                        }
-
-                        sockets.set(kickedIndex, null);
-                        ObjectOutputs.set(kickedIndex, null);
-                        ObjectInputs.set(kickedIndex, null);
-                        userID.set(kickedIndex, null);
+//                        // once kick a user, update the user list information
+//                        for (int i = 0; i<sockets.size(); i++) {
+//                            System.out.println("send delete of: "+userID.get(kickedIndex) );
+//                            if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
+//                                ObjectOutputStream oos2 =  ObjectOutputs.get(i);
+//                                oos.writeObject(new UserListUpdate("updateUserList", "server", userID.get(kickedIndex),"delete"));
+//                                oos.flush();
+//                            }
+//                        }
+//
+//                        sockets.set(kickedIndex, null);
+//                        ObjectOutputs.set(kickedIndex, null);
+//                        ObjectInputs.set(kickedIndex, null);
+//                        userID.set(kickedIndex, null);
 
                     }
 
