@@ -222,6 +222,7 @@ public class Server {
 
                 } catch (IOException | ClassNotFoundException e)  {
                     if (socketNum> userID.size()-1) {
+                        userID.add(null);
                         sockets.set(socketNum, null);
                         ObjectOutputs.set(socketNum, null);
                         ObjectInputs.set(socketNum, null);
