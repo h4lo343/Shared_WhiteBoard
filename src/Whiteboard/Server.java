@@ -44,9 +44,9 @@ public class Server {
             ObjectInputs.add(new ObjectInputStream(client.getInputStream()));
             ObjectOutputs.add(new ObjectOutputStream(client.getOutputStream()));
 
-//            // new ObjectInputStream， new ObjectOutputStream usually time sometime, for
-//            // the list consistent, wait for 1 second
-//            Thread.sleep(1000);
+            // new ObjectInputStream， new ObjectOutputStream usually time sometime, for
+            // the list consistent, wait for 1 second
+            Thread.sleep(1000);
 
 
             // if the user is the first in the server, give
