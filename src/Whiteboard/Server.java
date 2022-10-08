@@ -100,6 +100,7 @@ public class Server {
                                 ObjectOutputStream oos = ObjectOutputs.get(socketNum);
                                 oos.writeObject(new Message("duplicate", m.senderID));
                                 oos.flush();
+                                break;
                             }
                         }
 
@@ -228,6 +229,7 @@ public class Server {
                     }
 
                 } catch (IOException | ClassNotFoundException e)  {
+
                     // this if is for user who are rejected by manager at first
                     // for those clients, their user name has not been added to userID list,
                     // we should set a if to avoid outOfBound exception
