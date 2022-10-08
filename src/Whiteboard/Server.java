@@ -37,7 +37,6 @@ public class Server {
         // open a while loop to take any incoming request
         while(true) {
             Socket client = s.accept();
-            System.out.println("receive client");
 
             // put client socket into the socket list
             sockets.add(client);
@@ -221,12 +220,33 @@ public class Server {
                     }
 
                 } catch (IOException | ClassNotFoundException e)  {
+                    // this if is for user who are rejected by manager at first
+                    // for those clients, their user name has not been added to userID list,
+                    // we should set a if to avoid outOfBound exception
                     if (socketNum> userID.size()-1) {
+                        // add a null in userID, to keep the userID list consistent with other 3 lists
                         userID.add(null);
                         sockets.set(socketNum, null);
                         ObjectOutputs.set(socketNum, null);
                         ObjectInputs.set(socketNum, null);
                         break;}
+
+                        // if manager left, shut down server and inform every client to close the application
+                        if (socketNum == 0) {
+                            try {
+                                for (int i = 0; i<sockets.size(); i++) {
+                                    if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
+                                        ObjectOutputStream oos =  ObjectOutputs.get(i);
+                                        oos.writeObject(new ManagerLeave("leave", "server"));
+                                        oos.flush();
+                                        System.out.println("manager left, shut down the server");
+                                        System.exit(0);
+                                    }
+                                }
+                            } catch (Exception e2) {
+                                e2.printStackTrace();
+                            }
+                        }
                         // if one client exited, set its socket position and I/O position in lists as null
                         if (socketNum<=sockets.size()-1) {
                             System.out.println("client left: "+userID.get(socketNum));
@@ -239,7 +259,6 @@ public class Server {
                         //once a client leave, we have to send all other clients the updated userlist
                         try {
                             for (int i = 0; i<sockets.size(); i++) {
-                                System.out.println("send delete of: "+userID.get(socketNum) );
                                 if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
                                     ObjectOutputStream oos =  ObjectOutputs.get(i);
                                     oos.writeObject(new UserListUpdate("updateUserList", "server", userID.get(socketNum),"delete"));
