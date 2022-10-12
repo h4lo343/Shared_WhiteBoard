@@ -129,7 +129,7 @@ public class Server {
                                 try {
                                     Init(sockets.size()-1);
                                 } catch (IOException | InterruptedException e) {
-                                    e.printStackTrace();
+
                                 }
                             }
                         });
@@ -270,7 +270,7 @@ public class Server {
                                     }
                                 }
                             } catch (Exception e2) {
-                                e2.printStackTrace();
+
                             }
                         }
                         // if one client exited, set its socket position and I/O position in lists as null
@@ -292,10 +292,10 @@ public class Server {
                                 }
                             }
                         } catch (Exception e2) {
-                            e2.printStackTrace();
+
                         }
                         userID.set(socketNum, null);
-                        e.printStackTrace();
+
                         break;
 
                 }

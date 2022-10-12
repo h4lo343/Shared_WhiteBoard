@@ -76,7 +76,7 @@ public class CreateWhiteBoard {
                     receiver = r;
                     r.start();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    
                 }
             }
         });
@@ -100,7 +100,7 @@ public class CreateWhiteBoard {
                             boardUI();
                             break;
                         } catch (IOException e) {
-                            e.printStackTrace();
+
                         }
                     }
                 }
@@ -407,7 +407,7 @@ public class CreateWhiteBoard {
                             try {
                                 l.sendKick((String) List.getSelectedValue());
                             } catch (IOException ex) {
-                                ex.printStackTrace();
+
                             }
                         }
                     }
@@ -661,7 +661,7 @@ public class CreateWhiteBoard {
 
 
                 } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
+
                 }
             }
         }
