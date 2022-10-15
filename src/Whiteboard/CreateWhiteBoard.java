@@ -47,8 +47,13 @@ public class CreateWhiteBoard {
     public void start(String ip, int port, String username) throws IOException {
 
         this.username = username;
+        try {
+            Socket s = new Socket(ip, port);
+        }catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "No such server or server is closed");
+            System.exit(0);
+        }
 
-        Socket s = new Socket(ip, port);
 
         this.s = s;
         this.is = s.getInputStream();
@@ -61,7 +66,7 @@ public class CreateWhiteBoard {
 
         // open a receiver, the reason to put it in a thread is:
         // if not do this, it would block the boot of gut in the next lines
-        Thread t = new Thread(new Runnable() {
+        Thread ReceiveStarter = new Thread(new Runnable() {
             @Override
             public void run() {
                 // open a receiver
@@ -75,7 +80,7 @@ public class CreateWhiteBoard {
                 }
             }
         });
-        t.start();
+        ReceiveStarter.start();
 
 
         Thread checker = new Thread(new Runnable() {

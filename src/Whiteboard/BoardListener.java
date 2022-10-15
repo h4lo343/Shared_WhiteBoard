@@ -15,7 +15,7 @@ import java.io.OutputStream;
  * @date 2022/9/27 22:33
  */
 public class BoardListener implements MouseListener, ActionListener, MouseMotionListener {
-    // the index for mouse: x,y(the pressed pint), x1,y1(drag point), x2,y2(release point)
+    // the index for mouse: x,y(the pressed point), x1,y1(drag point), x2,y2(release point)
     int x, y, x1, y1, x2, y2;
     String penType = "Pen";
     Graphics2D graph;
