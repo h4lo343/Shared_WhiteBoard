@@ -49,6 +49,7 @@ public class CreateWhiteBoard {
         this.username = username;
         try {
             Socket s = new Socket(ip, port);
+            this.s = s;
         }catch (Exception e) {
             JOptionPane.showMessageDialog(null, "No such server or server is closed");
             System.exit(0);
