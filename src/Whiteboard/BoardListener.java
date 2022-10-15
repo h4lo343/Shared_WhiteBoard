@@ -176,7 +176,7 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
             oos.flush();
 
         } catch (IOException e) {
-            e.printStackTrace();
+
         }
     }
 
@@ -187,7 +187,7 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
             oos.writeObject(m);
             oos.flush();
         } catch (IOException e) {
-            e.printStackTrace();
+
         }
     }
 
@@ -199,7 +199,7 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
             oos.flush();
             System.out.println("send reply to server");
         } catch (IOException e) {
-            e.printStackTrace();
+
         }
     }
 
@@ -217,7 +217,17 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
             oos.writeObject(m);
             oos.flush();
         } catch (IOException e) {
-            e.printStackTrace();
+
+        }
+    }
+
+    public void sendNewCanva() {
+        try {
+            Message m = new Message("new", this.senderID);
+            oos.writeObject(m);
+            oos.flush();
+        } catch ( IOException e) {
+
         }
     }
 
@@ -228,7 +238,7 @@ public class BoardListener implements MouseListener, ActionListener, MouseMotion
             oos.writeObject(c);
             oos.flush();
         } catch (IOException e) {
-            e.printStackTrace();
+
         }
     }
 

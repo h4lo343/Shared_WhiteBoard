@@ -152,6 +152,20 @@ public class Server {
 
                     }
 
+                    // if the server received new canvas message from manager
+                    // it should broadcast it to every client to empty their canvas
+                    // and clean the shape list in the server
+                    if (m.message.equals("new")) {
+                        for (int i = 0; i<sockets.size(); i++) {
+                            if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
+                                ObjectOutputStream oos = ObjectOutputs.get(i);
+                                oos.writeObject(new Message("new", "server"));
+                                oos.flush();
+                                shapes.clear();
+                            }
+                        }
+                    }
+
 
                     // response to kick request from manager, remove that user
                     // let send him an inform
@@ -169,21 +183,6 @@ public class Server {
                         ObjectOutputStream oos = ObjectOutputs.get(kickedIndex);
                         oos.writeObject(new Message("kick","server"));
                         oos.flush();
-
-//                        // once kick a user, update the user list information
-//                        for (int i = 0; i<sockets.size(); i++) {
-//                            System.out.println("send delete of: "+userID.get(kickedIndex) );
-//                            if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
-//                                ObjectOutputStream oos2 =  ObjectOutputs.get(i);
-//                                oos.writeObject(new UserListUpdate("updateUserList", "server", userID.get(kickedIndex),"delete"));
-//                                oos.flush();
-//                            }
-//                        }
-//
-//                        sockets.set(kickedIndex, null);
-//                        ObjectOutputs.set(kickedIndex, null);
-//                        ObjectInputs.set(kickedIndex, null);
-//                        userID.set(kickedIndex, null);
 
                     }
 
@@ -214,7 +213,6 @@ public class Server {
                                 ObjectOutputStream oos = ObjectOutputs.get(i);
                                 oos.writeObject(chat);
                                 oos.flush();
-                                System.out.println("send: "+ chat.chatContent+" to: "+sockets.get(i).getInetAddress());
                             }
                         }
                     }
@@ -260,6 +258,7 @@ public class Server {
                         // if manager left, shut down server and inform every client to close the application
                         if (socketNum == 0) {
                             try {
+
                                 for (int i = 1; i<sockets.size(); i++) {
                                     if(sockets.get(i)!=null && sockets.size() == ObjectOutputs.size()) {
                                         ObjectOutputStream oos =  ObjectOutputs.get(i);
@@ -269,6 +268,7 @@ public class Server {
                                         System.exit(0);
                                     }
                                 }
+                                System.exit(0);
                             } catch (Exception e2) {
 
                             }
@@ -277,7 +277,6 @@ public class Server {
                         if (socketNum<=sockets.size()-1) {
                             System.out.println("client left: "+userID.get(socketNum));
                         }
-                        System.out.println("client left: "+userID.get(socketNum));
                         sockets.set(socketNum, null);
                         ObjectOutputs.set(socketNum, null);
                         ObjectInputs.set(socketNum, null);

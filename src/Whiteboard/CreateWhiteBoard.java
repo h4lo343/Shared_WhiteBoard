@@ -48,11 +48,6 @@ public class CreateWhiteBoard {
 
         this.username = username;
 
-
-        //"100.93.54.162"
-        //"10.13.102.149"
-        //"10.13.127.172"
-
         Socket s = new Socket(ip, port);
 
         this.s = s;
@@ -76,7 +71,7 @@ public class CreateWhiteBoard {
                     receiver = r;
                     r.start();
                 } catch (IOException e) {
-                    
+
                 }
             }
         });
@@ -215,7 +210,9 @@ public class CreateWhiteBoard {
                 if (l.authorized == false) {
                     JOptionPane.showMessageDialog(null, "only manager can do this");
                 }
-                canva.repaint();
+                l.sendNewCanva();
+
+
             }
         });
 
@@ -290,6 +287,7 @@ public class CreateWhiteBoard {
                 if (l.authorized == false) {
                     JOptionPane.showMessageDialog(null, "only manager can do this");
                 }
+
                 JFileChooser saveAs = new JFileChooser("Save As .png");
                 saveAs.setDialogTitle("Save as PNG");
                 saveAs.showSaveDialog(null);
@@ -302,7 +300,18 @@ public class CreateWhiteBoard {
                 } catch (Exception e2) {
                     System.out.println(e2);
                 }
+            }
+        });
 
+        // add close canva function for manager
+        closeCanva.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // checker whether the operator is manager
+                if (l.authorized == false) {
+                    JOptionPane.showMessageDialog(null, "only manager can do this");
+                }
+                System.exit(0);
             }
         });
 
@@ -623,15 +632,17 @@ public class CreateWhiteBoard {
                                         }
                                         break;
 
+                                    // if received a kick information
+                                    // user shall leave the application
                                     case "kick":
                                         JOptionPane.showMessageDialog(null, "you are kicked by manager");
                                         System.exit(0);
                                         break;
 
+                                    // add chat information to the chat window
                                     case "chat":
                                         if(m instanceof ChatMessage) {
                                             ChatMessage chat = (ChatMessage)m;
-                                            System.out.println(chat.chatContent+"-------");
                                             String id = chat.senderID;
                                             String content = chat.chatContent;
                                             // set the if because sometimes the receiver starts before the
@@ -643,15 +654,27 @@ public class CreateWhiteBoard {
                                         }
                                         break;
 
+                                    // if received leave from server
+                                    // it means manager has left, close the application
                                     case "leave":
                                         JOptionPane.showMessageDialog(null, "manager left, turn off the application");
                                         System.exit(0);
                                         break;
 
+                                    // show user there is already the same name in the whiteboard
                                     case "duplicate":
                                         JOptionPane.showMessageDialog(null, "username: "+ m.senderID+" already exists, use a different name to try again");
                                         System.exit(0);
                                         break;
+
+                                    // after user received the new message,
+                                    // clean its canvas
+                                    case "new":
+                                        l.graphSave.setColor(Color.white);
+                                        l.graph.setColor(Color.white);
+                                        l.graphSave.fillRect(0,0,1200,800);
+                                        l.graph.fillRect(0,0,1200,800);
+
                             }
                         }
                     }
