@@ -215,6 +215,7 @@ public class CreateWhiteBoard {
                 // checker whether the operator is manager
                 if (l.authorized == false) {
                     JOptionPane.showMessageDialog(null, "only manager can do this");
+                    return;
                 }
                 l.sendNewCanva();
 
@@ -229,6 +230,7 @@ public class CreateWhiteBoard {
                 // checker whether the operator is manager
                 if (l.authorized == false) {
                     JOptionPane.showMessageDialog(null, "only manager can do this");
+                    return;
                 }
                 // empty the current canva
                 canva.repaint();
@@ -268,6 +270,7 @@ public class CreateWhiteBoard {
                 // checker whether the operator is manager
                 if (l.authorized == false) {
                     JOptionPane.showMessageDialog(null, "only manager can do this");
+                    return;
                 }
                 JFileChooser saveAs = new JFileChooser("Save As .jpg");
                 saveAs.setDialogTitle("Save as JPG");
@@ -292,6 +295,7 @@ public class CreateWhiteBoard {
                 // checker whether the operator is manager
                 if (l.authorized == false) {
                     JOptionPane.showMessageDialog(null, "only manager can do this");
+                    return;
                 }
 
                 JFileChooser saveAs = new JFileChooser("Save As .png");
@@ -316,6 +320,7 @@ public class CreateWhiteBoard {
                 // checker whether the operator is manager
                 if (l.authorized == false) {
                     JOptionPane.showMessageDialog(null, "only manager can do this");
+                    return;
                 }
                 System.exit(0);
             }
@@ -643,10 +648,11 @@ public class CreateWhiteBoard {
                                     // if received a kick information
                                     // user shall leave the application
                                     case "kick":
-
-                                            JOptionPane.showMessageDialog(null, "you are kicked by manager");
-                                            System.exit(0);
-
+                                            if (m.senderID.equals(username)) {
+                                                System.out.println("received kick: "+m.senderID);
+                                                JOptionPane.showMessageDialog(null, "you are kicked by manager");
+                                                System.exit(0);
+                                            }
                                         break;
 
                                     // add chat information to the chat window
