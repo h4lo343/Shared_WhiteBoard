@@ -180,8 +180,9 @@ public class Server {
                                 kickedIndex=i;
                             }
                         }
+                        System.out.println("send kick to: "+ userID.get(kickedIndex));
                         ObjectOutputStream oos = ObjectOutputs.get(kickedIndex);
-                        oos.writeObject(new Message("kick","server"));
+                        oos.writeObject(new Message("kick",k.userID));
                         oos.flush();
 
                     }

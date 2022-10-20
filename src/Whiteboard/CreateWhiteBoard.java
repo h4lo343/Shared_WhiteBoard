@@ -412,9 +412,11 @@ public class CreateWhiteBoard {
                 if (List.getSelectedValue()!=null) {
                     if (l.authorized == false) {
                         JOptionPane.showMessageDialog(null, "only manager can do this");
+                        return;
                     }
                     if (List.getSelectedValue().equals(l.senderID)) {
                         JOptionPane.showMessageDialog(null, "You can not kick yourself");
+                        return;
                     }
                     else {
                         int input = JOptionPane.showConfirmDialog(null, "Do you really want to kick user: "+ List.getSelectedValue(),"Kick", JOptionPane.YES_NO_OPTION);
@@ -641,8 +643,10 @@ public class CreateWhiteBoard {
                                     // if received a kick information
                                     // user shall leave the application
                                     case "kick":
-                                        JOptionPane.showMessageDialog(null, "you are kicked by manager");
-                                        System.exit(0);
+
+                                            JOptionPane.showMessageDialog(null, "you are kicked by manager");
+                                            System.exit(0);
+
                                         break;
 
                                     // add chat information to the chat window
